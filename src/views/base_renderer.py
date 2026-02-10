@@ -95,8 +95,6 @@ class BaseRenderer(ABC):
             render_glow(
                 self.screen,
                 glow_config['color'],
-                glow_config['x'],
-                glow_config['y'],
                 glow_config.get('cache_key')
             )
 
@@ -116,7 +114,7 @@ class BaseRenderer(ABC):
             task: Task object
 
         Returns:
-            Dictionary with 'color', 'x', 'y', and optional 'cache_key',
+            Dictionary with 'color' and optional 'cache_key',
             or None to disable glow
         """
         # Default: no glow (subclasses override)

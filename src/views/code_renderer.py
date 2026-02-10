@@ -42,8 +42,6 @@ class CodeRenderer(BaseRenderer):
 
         return {
             'color': CODE_ACCENT_COLOR,
-            'x': self.screen_rect.width // 2,
-            'y': self.screen_rect.height // 2,
             'cache_key': 'code'
         }
 

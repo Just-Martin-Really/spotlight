@@ -37,8 +37,6 @@ class QuizRenderer(BaseRenderer):
         """
         return {
             'color': settings.COLOR_ACCENT_QUIZ,
-            'x': self.screen_rect.width // 2,
-            'y': self.screen_rect.height // 2,
             'cache_key': 'quiz'
         }
 

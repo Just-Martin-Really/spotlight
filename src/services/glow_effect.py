@@ -1,45 +1,41 @@
 """
 Glow effect service for TIA25 Spotlight.
 
-Provides performant glow rendering behind content areas.
-Uses layered circles for gaussian-like blur approximation.
+Provides subtle background glow effect behind content.
+Creates a large, soft gradient overlay across the screen.
 
-Design principle: Performance-first, subtle visual enhancement.
+Design principle: Ambient background lighting, not spotlights.
 """
 
 import pygame
-from typing import Tuple
+from typing import Tuple, Optional
 from config import settings
 
 
 class GlowEffect:
     """
-    Service for rendering glow effects behind content.
+    Service for rendering ambient background glow effects.
 
-    Implements a multi-layer radial gradient to simulate glow.
-    Effects are cached per task type for performance.
+    Creates large, soft gradient overlays that fill the screen
+    with subtle colored light behind content.
     """
 
     def __init__(self):
         """Initialize glow effect cache."""
         self._glow_cache = {}
 
-    def render_centered_glow(
-            self,
-            surface: pygame.Surface,
-            color: Tuple[int, int, int],
-            center_x: int,
-            center_y: int,
-            cache_key: str = None
+    def render_background_glow(
+        self,
+        surface: pygame.Surface,
+        color: Tuple[int, int, int],
+        cache_key: str = None
     ) -> None:
         """
-        Render a glow effect centered at specified position.
+        Render a large background glow effect across entire screen.
 
         Args:
             surface: Surface to draw on
             color: RGB color for glow (task accent color)
-            center_x: X coordinate of glow center
-            center_y: Y coordinate of glow center
             cache_key: Optional cache key (e.g., task type)
         """
         if not settings.GLOW_ENABLED:
@@ -50,60 +46,75 @@ class GlowEffect:
             glow_surface = self._glow_cache[cache_key]
         else:
             # Create new glow surface
-            glow_surface = self._create_glow_surface(color)
+            glow_surface = self._create_background_glow(surface.get_size(), color)
 
             # Cache if key provided
             if cache_key:
                 self._glow_cache[cache_key] = glow_surface
 
-        # Calculate position to center the glow
-        glow_rect = glow_surface.get_rect(
-            center=(center_x, center_y)
-        )
+        # Blit at origin - glow surface is full screen size
+        surface.blit(glow_surface, (0, 0))
 
-        # Blit glow surface
-        surface.blit(glow_surface, glow_rect, special_flags=pygame.BLEND_RGBA_ADD)
-
-    def _create_glow_surface(
-            self,
-            color: Tuple[int, int, int]
+    def _create_background_glow(
+        self,
+        screen_size: Tuple[int, int],
+        color: Tuple[int, int, int]
     ) -> pygame.Surface:
         """
-        Create a glow surface with layered circles.
+        Create a large background glow surface.
+
+        Strategy:
+        1. Create full-screen surface
+        2. Draw large radial gradient from center
+        3. Make it subtle with low alpha
 
         Args:
+            screen_size: Screen dimensions (width, height)
             color: RGB color for glow
 
         Returns:
-            Transparent surface with glow effect
+            Transparent surface with background glow
         """
-        # Create surface with alpha channel
-        size = settings.GLOW_RADIUS * 2
-        glow_surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        width, height = screen_size
+
+        # Create full-screen surface with alpha
+        glow_surface = pygame.Surface(screen_size, pygame.SRCALPHA)
+        glow_surface.fill((0, 0, 0, 0))
 
         # Center point
-        center = (settings.GLOW_RADIUS, settings.GLOW_RADIUS)
+        center_x = width // 2
+        center_y = height // 2
 
-        # Draw layered circles from outer to inner
-        # Each layer gets smaller radius and higher alpha
-        for i in range(settings.GLOW_LAYERS):
-            # Calculate this layer's properties
-            layer_progress = (i + 1) / settings.GLOW_LAYERS
+        # Calculate maximum radius to cover screen
+        max_radius = int(((width ** 2 + height ** 2) ** 0.5) / 2)
 
-            # Radius decreases from GLOW_RADIUS to ~30% of it
-            radius = int(settings.GLOW_RADIUS * (1 - layer_progress * 0.7))
+        # Draw radial gradient with many layers
+        # More layers = smoother gradient
+        num_layers = 50
 
-            # Alpha increases from low to GLOW_INTENSITY
-            alpha = int(settings.GLOW_INTENSITY * layer_progress)
+        for i in range(num_layers, 0, -1):
+            # Progress from outer (0.0) to inner (1.0)
+            progress = i / num_layers
 
-            # Create color with alpha
+            # Radius decreases from max to a small core
+            radius = int(max_radius * progress)
+
+            # Alpha increases towards center but stays subtle
+            # Use quadratic falloff for more natural glow
+            alpha = int(settings.GLOW_INTENSITY * (1 - progress) ** 2)
+
+            # Don't draw if alpha would be 0
+            if alpha < 1:
+                continue
+
+            # Create color with calculated alpha
             glow_color = (*color, alpha)
 
-            # Draw circle
+            # Draw filled circle for this layer
             pygame.draw.circle(
                 glow_surface,
                 glow_color,
-                center,
+                (center_x, center_y),
                 radius
             )
 
@@ -119,23 +130,19 @@ _glow_effect = GlowEffect()
 
 
 def render_glow(
-        surface: pygame.Surface,
-        color: Tuple[int, int, int],
-        center_x: int,
-        center_y: int,
-        cache_key: str = None
+    surface: pygame.Surface,
+    color: Tuple[int, int, int],
+    cache_key: str = None
 ) -> None:
     """
-    Convenience function to render glow effect.
+    Convenience function to render background glow effect.
 
     Args:
         surface: Surface to draw on
         color: RGB color for glow
-        center_x: X coordinate of glow center
-        center_y: Y coordinate of glow center
         cache_key: Optional cache key for performance
     """
-    _glow_effect.render_centered_glow(surface, color, center_x, center_y, cache_key)
+    _glow_effect.render_background_glow(surface, color, cache_key)
 
 
 def clear_glow_cache() -> None:
