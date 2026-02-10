@@ -36,7 +36,7 @@ class QuizTask(BaseTask):
         question: Main quiz question text (required)
         note: Additional context or moderation hint (optional)
     """
-    question: str
+    question: str = None
     note: Optional[str] = None
 
 
@@ -52,8 +52,8 @@ class TabuTask(BaseTask):
         topic: Subject to be explained
         forbidden_words: List of words that must not be used
     """
-    topic: str
-    forbidden_words: List[str]
+    topic: str = None
+    forbidden_words: List[str] = None
 
 
 @dataclass
@@ -68,7 +68,7 @@ class DiscussionTask(BaseTask):
         prompt: Discussion topic or question
         spotlight_duration: Suggested time allocation (e.g., "5 minutes")
     """
-    prompt: str
+    prompt: str = None
     spotlight_duration: Optional[str] = None
 
 
