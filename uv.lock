@@ -355,7 +355,7 @@ wheels = [
 ]
 
 [[package]]
-name = "tia25-spotlight"
+name = "spotlight"
 version = "1.0.0"
 source = { editable = "." }
 dependencies = [

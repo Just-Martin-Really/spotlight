@@ -3,11 +3,11 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tia25-spotlight"
+name = "spotlight"
 version = "1.0.0"
 description = "Interactive quiz and learning session application for TIA25 course"
 authors = [
-    {name = "TIA25 Course Team"}
+    {name = "Martin Ließ"}
 ]
 readme = "README.md"
 requires-python = ">=3.10"
