@@ -15,12 +15,12 @@ Die einfachste Art beizutragen:
 ### 2. Bugs finden und melden
 - Teste die Anwendung mit verschiedenen Setups
 - Dokumentiere Probleme mit genauen Schritten zur Reproduktion
-- Erstelle ein Issue auf GitHub (wenn verfügbar)
+- Erstelle ein Issue auf GitHub
 
 ### 3. Dokumentation verbessern
 - README klarer machen
 - Beispiele hinzufügen
-- Übersetzungen (Englisch ↔ Deutsch)
+- Übersetzungen
 
 ### 4. Neue Features entwickeln
 Siehe "Feature-Ideen" unten!

@@ -1,9 +1,35 @@
 # Changelog
 
-All notable changes to Spotlight will be documented in this file.
+All notable changes to TIA25 Spotlight will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.1.0] - 2025-02-10
+
+### Added
+- **Code Task Type** (`"code"`)
+  - Display code snippets with questions
+  - Use cases: "Erkenne den Fehler", "Welche Programmiersprache?"
+  - Monospace font rendering
+  - Easy JSON integration with `\n` for line breaks
+  - Orange accent color for coding theme
+
+- **Explain-To Task Type** (`"explain_to"`)
+  - Challenge participants to explain technical topics to specific audiences
+  - Examples: grandmother, 5-year-old, insurance agent
+  - Purple accent color for communication theme
+  - Optional hints for what to focus on
+
+- **New Example Tasks**
+  - Code analysis examples (Python, JavaScript, SQL)
+  - Explain-to examples (Rekursion, API, Blockchain)
+
+### Technical
+- New renderers: `CodeRenderer`, `ExplainToRenderer`
+- New task models: `CodeTask`, `ExplainToTask`
+- Factory pattern extended for new types
+- All existing functionality preserved (no breaking changes)
 
 ## [1.0.0] - 2025-02-10
 

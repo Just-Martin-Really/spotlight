@@ -1,0 +1,194 @@
+# 🚀 Upgrade zu Version 1.1.0
+
+## ✨ Neue Features
+
+### 1. Code-Tasks (`"code"`)
+Zeige Code-Snippets mit Fragen wie:
+- "Erkenne den Fehler"
+- "Welche Programmiersprache ist das?"
+- "Was gibt dieser Code aus?"
+
+### 2. Explain-To-Tasks (`"explain_to"`)
+Fordere Teilnehmer heraus, technische Themen zu erklären:
+- "Erkläre deiner Oma..."
+- "Erkläre einem 5-Jährigen..."
+- "Erkläre einer Versicherungsmaklerin..."
+
+---
+
+## 📦 Aktualisierte Dateien
+
+### Neue Dateien (2):
+- `src/views/code_renderer.py` - Code-Snippet Renderer
+- `src/views/explain_to_renderer.py` - Explain-To Renderer
+
+### Geänderte Dateien (5):
+- `src/models/task.py` - Neue Task-Typen hinzugefügt
+- `src/core/application.py` - Neue Renderer registriert
+- `data/tasks.json` - Beispiele hinzugefügt (jetzt 19 Tasks statt 12)
+- `README.md` - Dokumentation aktualisiert
+- `CHANGELOG.md` - Version 1.1.0 dokumentiert
+
+---
+
+## 🔧 Installation
+
+### Wenn du das komplette Projekt neu heruntergeladen hast:
+```bash
+# Nichts zu tun! Alles ist bereits integriert.
+python main.py
+```
+
+### Wenn du nur Updates willst:
+
+1. **Kopiere die neuen Renderer**:
+   - `src/views/code_renderer.py`
+   - `src/views/explain_to_renderer.py`
+
+2. **Ersetze diese Dateien**:
+   - `src/models/task.py`
+   - `src/core/application.py`
+   - `data/tasks.json` (oder füge manuell Tasks hinzu)
+   - `README.md`
+   - `CHANGELOG.md`
+
+3. **Teste**:
+   ```bash
+   python verify_install.py
+   python main.py
+   ```
+
+---
+
+## 📝 Neue Task-Beispiele
+
+### Code-Task:
+```json
+{
+  "type": "code",
+  "code": "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n-1)",
+  "question": "Erkenne den Fehler in diesem Code",
+  "note": "Tipp: Denk an negative Zahlen"
+}
+```
+
+**Wichtig**:
+- Nutze `\n` für Zeilenumbrüche
+- Keine spezielle Syntax-Highlighting
+- Code wird in Monospace-Font dargestellt
+
+### Explain-To-Task:
+```json
+{
+  "type": "explain_to",
+  "topic": "Was ist eine API?",
+  "audience": "einem 5-Jährigen",
+  "note": "Nutze ein alltägliches Beispiel"
+}
+```
+
+**Audience-Beispiele**:
+- `"deiner Oma"`
+- `"einem 5-Jährigen"`
+- `"einer Versicherungsmaklerin"`
+- `"deinem Friseur"`
+- `"einem Astronauten"`
+
+---
+
+## 🎨 Visuelle Unterschiede
+
+### Code-Tasks:
+- **Farbe**: Orange/Amber (Akzent)
+- **Font**: Monospace
+- **Layout**: Code in umrandeter Box, links ausgerichtet
+
+### Explain-To-Tasks:
+- **Farbe**: Lila/Purple (Akzent)
+- **Layout**: Zentriert, freundlich
+- **Stil**: Einladend, Kommunikation betonend
+
+---
+
+## ✅ Was bleibt gleich?
+
+- **Keine Breaking Changes** - alle alten Tasks funktionieren
+- **Gleiche Navigation** (← → ESC)
+- **Gleiche Architektur** (Factory Pattern, MVC)
+- **Gleiche Installation**
+- **Alle bestehenden Features** (Quiz, Tabu, Discussion)
+
+---
+
+## 🧪 Testing
+
+Nach dem Update:
+
+```bash
+# 1. Verifikation
+python verify_install.py
+
+# 2. Teste neue Task-Typen
+python main.py
+# Navigiere zu Code/Explain-To-Tasks (ab Task 13+)
+
+# 3. Eigene Tasks hinzufügen
+# Bearbeite data/tasks.json und teste
+```
+
+---
+
+## 💡 Tipps für Code-Tasks
+
+### JSON-Escaping:
+```json
+// ✓ Richtig
+"code": "print(\"Hello World\")"
+
+// ✗ Falsch (vergessene Escapes)
+"code": "print("Hello World")"
+```
+
+### Multi-Line Code:
+```json
+"code": "def greet():\n    print('Hi')\n    return True"
+```
+
+### Verschiedene Sprachen:
+```json
+// Python
+"code": "for i in range(10):\n    print(i)"
+
+// JavaScript
+"code": "const x = [1,2,3].map(n => n*2);"
+
+// SQL
+"code": "SELECT * FROM users WHERE age > 18;"
+```
+
+---
+
+## 🎓 Moderation der neuen Task-Typen
+
+### Code-Tasks:
+1. Gib Teilnehmern Zeit zum Lesen (10-20 Sek)
+2. Bei "Fehler finden": Erlaube Diskussion
+3. Bei "Welche Sprache": Schnelle Antworten
+
+### Explain-To-Tasks:
+1. Wähle Freiwilligen
+2. Betone: **Einfachheit ist Trumpf**
+3. Publikum darf "Verständnisfragen" stellen
+4. 2-3 Minuten Zeit geben
+
+---
+
+## 📞 Support
+
+- **Fragen zu neuen Features**: Siehe README.md Abschnitt "Task Types"
+- **Code funktioniert nicht**: Überprüfe JSON-Syntax
+- **Rendering-Probleme**: Stelle sicher, dass Monospace-Font verfügbar ist
+
+---
+
+**Version 1.1.0 ready to use! 🎉**

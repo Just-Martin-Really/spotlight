@@ -1,8 +1,8 @@
-# 🎓 Spotlight
+# 🎓 TIA25 Spotlight
 
 **Interactive Quiz & Learning Session Application**
 
-Spotlight is a fullscreen presentation tool for running interactive quiz nights, Tabu-style challenges, and Spotlight discussions in a classroom or lecture hall setting. Built with Python and Pygame for TIA25 course events.
+TIA25 Spotlight is a fullscreen presentation tool for running interactive quiz nights, Tabu-style challenges, and Spotlight discussions in a classroom or lecture hall setting. Built with Python and Pygame for TIA25 course events.
 
 ---
 
@@ -11,6 +11,8 @@ Spotlight is a fullscreen presentation tool for running interactive quiz nights,
 - **📋 Quiz Mode** - Display questions prominently with optional moderator notes
 - **🚫 Tabu/Explain Mode** - Challenge participants to explain topics without forbidden words
 - **💡 Spotlight Discussions** - Facilitate in-depth Q&A sessions with participants
+- **💻 Code Analysis** - Show code snippets for bug finding or language identification
+- **🎓 Explain-To Challenges** - Explain technical topics to specific audiences (Oma, 5-year-old, etc.)
 - **🎨 Clean, Professional UI** - High-contrast design optimized for projector visibility
 - **⌨️ Simple Navigation** - Arrow keys to move between tasks, ESC to quit
 - **📁 External Task Storage** - Edit tasks in JSON without touching code
@@ -29,7 +31,7 @@ Spotlight is a fullscreen presentation tool for running interactive quiz nights,
 
 1. **Clone or download this project**
    ```bash
-   cd spotlight
+   cd tia25-spotlight
    ```
 
 2. **Create a virtual environment** (recommended)
@@ -149,6 +151,49 @@ Facilitate open discussions where a participant explains a topic to the group.
 - `type` (required): `"discussion"`
 - `prompt` (required): Discussion topic or question
 - `spotlight_duration` (optional): Suggested time allocation
+
+#### 4. Code Tasks
+
+Display code snippets with questions like "Find the bug" or "Which programming language is this?". Code is shown in monospace font without syntax highlighting for easy JSON integration.
+
+```json
+{
+  "type": "code",
+  "code": "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n-1)",
+  "question": "Erkenne den Fehler in diesem Code",
+  "note": "Optional: Denk an Randfälle"
+}
+```
+
+**Fields:**
+- `type` (required): `"code"`
+- `code` (required): Code snippet (use `\n` for line breaks)
+- `question` (required): Question about the code
+- `note` (optional): Hint or additional context
+
+**Tips for JSON:**
+- Use `\n` for newlines in code
+- No special escaping needed for most code
+- Escape double quotes inside strings with `\"`
+
+#### 5. Explain-To Tasks
+
+Challenge participants to explain technical topics to specific audiences (grandmother, 5-year-old, insurance agent, etc.).
+
+```json
+{
+  "type": "explain_to",
+  "topic": "Was ist eine API?",
+  "audience": "einem 5-Jährigen",
+  "note": "Nutze ein alltägliches Beispiel"
+}
+```
+
+**Fields:**
+- `type` (required): `"explain_to"`
+- `topic` (required): Technical concept to explain
+- `audience` (required): Target audience (e.g., "deiner Oma", "einem 5-Jährigen", "einer Versicherungsmaklerin")
+- `note` (optional): Hint about what to focus on
 
 ---
 
@@ -356,7 +401,7 @@ MIT License - Feel free to use and modify for educational purposes.
 
 ## 🙏 Acknowledgments
 
-Created for **TIA25 course** by Martin Ließ.
+Created for **TIA25 course** by the course representatives.
 
 Built with:
 - **Python** - Programming language
@@ -371,6 +416,6 @@ For questions or issues:
 1. Check this README thoroughly
 2. Validate your `tasks.json` file
 3. Review error messages in terminal
-4. Contact me
+4. Contact course organizers
 
 **Have a great quiz night! 🎉**

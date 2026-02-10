@@ -57,20 +57,36 @@
     "topic": "Machine Learning",
     "forbidden_words": ["Modell", "Training", "Neuronales Netz", "KI", "Daten"]
   },
-    {
-    "type": "tabu",
-    "topic": "foo",
-    "forbidden_words": [""]
+  {
+    "type": "code",
+    "code": "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n-1)",
+    "question": "Erkenne den Fehler in diesem Code"
   },
-    {
-    "type": "quiz",
-    "question": "frage?",
-    "note": "Notiz"
+  {
+    "type": "explain_to",
+    "topic": "Rekursion",
+    "audience": "deiner Oma",
+    "note": "Nutze ein alltägliches Beispiel"
   },
-    {
-    "type": "discussion",
-    "prompt": "Diskussionsanregende Frage?",
-    "spotlight_duration": "Dauer"
+  {
+    "type": "code",
+    "code": "const greeting = name => {\n  return `Hello, ${name}!`;\n};",
+    "question": "Welche Programmiersprache ist das?"
+  },
+  {
+    "type": "explain_to",
+    "topic": "Was ist eine API?",
+    "audience": "einem 5-Jährigen"
+  },
+  {
+    "type": "code",
+    "code": "SELECT * FROM users\nWHERE age > 18\nORDER BY name ASC;",
+    "question": "Welche Programmiersprache ist das?"
+  },
+  {
+    "type": "explain_to",
+    "topic": "Blockchain",
+    "audience": "einer Versicherungsmaklerin",
+    "note": "Fokus auf praktischen Nutzen"
   }
-
 ]
