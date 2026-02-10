@@ -1,0 +1,60 @@
+[
+  {
+    "type": "quiz",
+    "question": "Was ist die Zeitkomplexität von QuickSort im Average Case?",
+    "note": "Diskutiere die Auswirkung der Pivot-Wahl auf die Performance"
+  },
+  {
+    "type": "tabu",
+    "topic": "Mengenlehre",
+    "forbidden_words": ["Menge", "Gruppe", "Ring", "bijektiv", "Element"]
+  },
+  {
+    "type": "discussion",
+    "prompt": "Erkläre den Unterschied zwischen Stack und Queue",
+    "spotlight_duration": "5 Minuten"
+  },
+  {
+    "type": "quiz",
+    "question": "Welche Datenstruktur würdest du für einen LRU-Cache verwenden?",
+    "note": "Überlege dir die Zeitkomplexität für Get und Put"
+  },
+  {
+    "type": "tabu",
+    "topic": "Objektorientierte Programmierung",
+    "forbidden_words": ["Klasse", "Objekt", "Vererbung", "Polymorphie", "Kapselung"]
+  },
+  {
+    "type": "quiz",
+    "question": "Was ist der Unterschied zwischen einem Compiler und einem Interpreter?"
+  },
+  {
+    "type": "discussion",
+    "prompt": "Warum ist funktionale Programmierung in modernen Systemen wichtig?",
+    "spotlight_duration": "7 Minuten"
+  },
+  {
+    "type": "tabu",
+    "topic": "Datenbanken",
+    "forbidden_words": ["SQL", "Tabelle", "Abfrage", "Index", "Transaktion"]
+  },
+  {
+    "type": "quiz",
+    "question": "Nenne drei Vorteile von Microservices gegenüber monolithischer Architektur",
+    "note": "Denke auch an die Nachteile!"
+  },
+  {
+    "type": "discussion",
+    "prompt": "Wie würdest du einen Anfänger die Bedeutung von Git erklären?",
+    "spotlight_duration": "4 Minuten"
+  },
+  {
+    "type": "quiz",
+    "question": "Was ist der Unterschied zwischen synchronem und asynchronem Code?"
+  },
+  {
+    "type": "tabu",
+    "topic": "Machine Learning",
+    "forbidden_words": ["Modell", "Training", "Neuronales Netz", "KI", "Daten"]
+  }
+]
