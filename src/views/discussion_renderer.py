@@ -60,7 +60,7 @@ class DiscussionRenderer(BaseRenderer):
         label_y = prompt_start_y - settings.FONT_SIZE_SMALL - settings.PADDING_MEDIUM
         draw_text_centered(
             self.screen,
-            "💡 Spotlight Diskussion",
+            "Spotlight Diskussion",
             self.font_small,
             settings.COLOR_ACCENT_DISCUSSION,
             label_y
@@ -82,7 +82,7 @@ class DiscussionRenderer(BaseRenderer):
         if task.spotlight_duration:
             current_y += settings.PADDING_MEDIUM
             
-            duration_text = f"⏱️  {task.spotlight_duration}"
+            duration_text = f"️ {task.spotlight_duration}"
             draw_text_centered(
                 self.screen,
                 duration_text,
