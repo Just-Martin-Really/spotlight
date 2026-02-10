@@ -56,5 +56,21 @@
     "type": "tabu",
     "topic": "Machine Learning",
     "forbidden_words": ["Modell", "Training", "Neuronales Netz", "KI", "Daten"]
+  },
+    {
+    "type": "tabu",
+    "topic": "foo",
+    "forbidden_words": [""]
+  },
+    {
+    "type": "quiz",
+    "question": "frage?",
+    "note": "Notiz"
+  },
+    {
+    "type": "discussion",
+    "prompt": "Diskussionsanregende Frage?",
+    "spotlight_duration": "Dauer"
   }
+
 ]
