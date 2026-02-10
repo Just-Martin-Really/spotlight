@@ -1,5 +1,5 @@
 """
-Quiz task renderer for TIA25 Spotlight.
+Quiz task renderer for Spotlight.
 
 Renders quiz questions with optional notes in a clean, focused layout.
 Uses blue accent color to distinguish from other task types.

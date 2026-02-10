@@ -1,5 +1,5 @@
 """
-Keyboard input configuration for TIA25 Spotlight.
+Keyboard input configuration for Spotlight.
 
 Centralizes all key bindings in one place for easy remapping.
 Decouples pygame key constants from application logic.

@@ -1,5 +1,5 @@
 """
-Rendering utility functions for TIA25 Spotlight.
+Rendering utility functions for Spotlight.
 
 Provides reusable text wrapping, centering, and drawing functions.
 Implements DRY principle - shared rendering logic used by all renderers.

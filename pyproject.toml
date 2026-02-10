@@ -33,7 +33,7 @@ dev = [
 ]
 
 [project.scripts]
-tia25-spotlight = "src.core.application:main"
+spotlight = "src.core.application:main"
 
 [tool.black]
 line-length = 100

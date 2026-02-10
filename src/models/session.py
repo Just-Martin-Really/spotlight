@@ -1,5 +1,5 @@
 """
-Session state management for TIA25 Spotlight.
+Session state management for Spotlight.
 
 Manages the current position in the task sequence and navigation history.
 Implements circular navigation (wrapping at start/end).

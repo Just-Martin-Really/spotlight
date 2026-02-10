@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Installation verification script for TIA25 Spotlight.
+Installation verification script for Spotlight.
 
 Run this after installation to verify everything is set up correctly.
 """
@@ -56,7 +56,7 @@ def check_task_file():
 def main():
     """Run all verification checks."""
     print("=" * 60)
-    print("TIA25 Spotlight - Installation Verification")
+    print("Spotlight - Installation Verification")
     print("=" * 60)
     print()
     

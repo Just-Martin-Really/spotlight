@@ -1,5 +1,5 @@
 """
-TIA25 Spotlight - Entry Point
+Spotlight - Entry Point
 
 Interactive quiz and learning session application for TIA25 course.
 Displays tasks fullscreen for audience participation.

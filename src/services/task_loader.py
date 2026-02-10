@@ -1,5 +1,5 @@
 """
-Task loading service for TIA25 Spotlight.
+Task loading service for Spotlight.
 
 Handles loading and parsing task data from JSON files.
 Provides error handling for common file and data issues.

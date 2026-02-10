@@ -1,4 +1,4 @@
-# 📦 TIA25 Spotlight - Alle Dateien
+# 📦 Spotlight - Alle Dateien
 
 ## ✅ Heruntergeladene Dateien
 
@@ -56,10 +56,10 @@
 
 ### 1. Ordnerstruktur erstellen
 
-Erstelle einen Ordner `tia25-spotlight` und lege alle Dateien in der richtigen Struktur ab:
+Erstelle einen Ordner `spotlight` und lege alle Dateien in der richtigen Struktur ab:
 
 ```
-tia25-spotlight/
+spotlight/
 ├── main.py
 ├── pyproject.toml
 ├── verify_install.py

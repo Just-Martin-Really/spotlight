@@ -1,5 +1,5 @@
 """
-Tabu task renderer for TIA25 Spotlight.
+Tabu task renderer for Spotlight.
 
 Renders explanation tasks with forbidden words prominently displayed.
 Uses red accent color to emphasize restrictions.

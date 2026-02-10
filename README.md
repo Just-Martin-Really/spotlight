@@ -1,8 +1,8 @@
-# 🎓 TIA25 Spotlight
+# 🎓 Spotlight
 
 **Interactive Quiz & Learning Session Application**
 
-TIA25 Spotlight is a fullscreen presentation tool for running interactive quiz nights, Tabu-style challenges, and Spotlight discussions in a classroom or lecture hall setting. Built with Python and Pygame for TIA25 course events.
+Spotlight is a fullscreen presentation tool for running interactive quiz nights, Tabu-style challenges, and Spotlight discussions in a classroom or lecture hall setting. Built with Python and Pygame for TIA25 course events.
 
 ---
 
@@ -29,7 +29,7 @@ TIA25 Spotlight is a fullscreen presentation tool for running interactive quiz n
 
 1. **Clone or download this project**
    ```bash
-   cd tia25-spotlight
+   cd spotlight
    ```
 
 2. **Create a virtual environment** (recommended)
@@ -356,7 +356,7 @@ MIT License - Feel free to use and modify for educational purposes.
 
 ## 🙏 Acknowledgments
 
-Created for **TIA25 course** by the course representatives.
+Created for **TIA25 course** by Martin Ließ.
 
 Built with:
 - **Python** - Programming language
@@ -371,6 +371,6 @@ For questions or issues:
 1. Check this README thoroughly
 2. Validate your `tasks.json` file
 3. Review error messages in terminal
-4. Contact course organizers
+4. Contact me
 
 **Have a great quiz night! 🎉**

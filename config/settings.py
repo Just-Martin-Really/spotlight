@@ -1,5 +1,5 @@
 """
-Configuration settings for TIA25 Spotlight application.
+Configuration settings for Spotlight application.
 
 This module contains all visual, layout, and performance settings.
 Acts as Single Source of Truth for the entire application's appearance.

@@ -1,5 +1,5 @@
 """
-Main application class for TIA25 Spotlight.
+Main application class for Spotlight.
 
 Orchestrates all components: loading, rendering, input, game loop.
 Implements Facade pattern - single entry point for the entire application.
@@ -84,7 +84,7 @@ class Application:
                 (settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
             )
         
-        pygame.display.set_caption("TIA25 Spotlight")
+        pygame.display.set_caption("Spotlight")
         
         # Create clock for FPS control
         self.clock = pygame.time.Clock()

@@ -1,6 +1,6 @@
-# 🤝 Contributing to TIA25 Spotlight
+# 🤝 Contributing to Spotlight
 
-Willkommen! Dieses Projekt ist für TIA25-Studierende gedacht und wir freuen uns über Beiträge.
+Willkommen! Dieses Projekt ist für Studierende gedacht und wir freuen uns über Beiträge.
 
 ---
 
@@ -39,7 +39,7 @@ Siehe "Feature-Ideen" unten!
 1. **Projekt klonen/forken**
    ```bash
    git clone <repository-url>
-   cd tia25-spotlight
+   cd spotlight
    ```
 
 2. **Virtual Environment erstellen**
@@ -307,4 +307,4 @@ pygame.font.get_fonts()  # Liste aller verfügbaren Fonts
 
 ---
 
-**Danke, dass du TIA25 Spotlight besser machst!**
+**Danke, dass du Spotlight besser machst!**

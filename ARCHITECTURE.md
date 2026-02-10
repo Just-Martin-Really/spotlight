@@ -1,4 +1,4 @@
-# TIA25 Spotlight - Architecture Overview
+# Spotlight - Architecture Overview
 
 ## Component Interaction Diagram
 

@@ -1,14 +1,14 @@
-# 🚀 Quick Start Guide - TIA25 Spotlight
+# 🚀 Quick Start Guide - Spotlight
 
 ## Installation (5 Minuten)
 
 ### Step 1: Extract the Project
-Unzip `tia25-spotlight` to your desired location.
+Unzip `spotlight` to your desired location.
 
 ### Step 2: Open Terminal/Command Prompt
 Navigate to the project folder:
 ```bash
-cd path/to/tia25-spotlight
+cd path/to/spotlight
 ```
 
 ### Step 3: Create Virtual Environment

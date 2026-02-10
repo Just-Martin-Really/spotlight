@@ -1,5 +1,5 @@
 """
-Input controller for TIA25 Spotlight.
+Input controller for Spotlight.
 
 Translates pygame keyboard events into application actions.
 Decouples pygame event handling from business logic.
