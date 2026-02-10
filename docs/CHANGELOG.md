@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Purple accent color for communication theme
   - Optional hints for what to focus on
 
+- **Glow Effect** ✨
+  - Subtle glow behind content using task-specific colors
+  - Performant implementation with caching
+  - Configurable intensity and radius in settings
+  - Can be disabled via `GLOW_ENABLED = False`
+
 - **New Example Tasks**
   - Code analysis examples (Python, JavaScript, SQL)
   - Explain-to examples (Rekursion, API, Blockchain)
@@ -28,7 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - New renderers: `CodeRenderer`, `ExplainToRenderer`
 - New task models: `CodeTask`, `ExplainToTask`
+- New service: `glow_effect.py` for visual effects
 - Factory pattern extended for new types
+- Template method pattern extended with `get_glow_config()`
 - All existing functionality preserved (no breaking changes)
 
 ## [1.0.0] - 2025-02-10

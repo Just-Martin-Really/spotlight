@@ -1,5 +1,5 @@
 """
-Configuration settings for Spotlight application.
+Configuration settings for TIA25 Spotlight application.
 
 This module contains all visual, layout, and performance settings.
 Acts as Single Source of Truth for the entire application's appearance.
@@ -88,3 +88,13 @@ QUIZ_NOTE_COLOR = COLOR_TEXT_MUTED
 
 # Discussion task settings
 DISCUSSION_TIMER_COLOR = COLOR_ACCENT_DISCUSSION
+
+# =============================================================================
+# VISUAL EFFECTS
+# =============================================================================
+
+# Glow effect settings
+GLOW_ENABLED = True  # Set to False to disable glow for performance
+GLOW_RADIUS = 100  # Radius of glow effect in pixels
+GLOW_INTENSITY = 40  # Alpha value (0-255, lower = more subtle)
+GLOW_LAYERS = 5  # Number of glow layers (more = smoother, but slower)

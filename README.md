@@ -13,6 +13,7 @@ TIA25 Spotlight is a fullscreen presentation tool for running interactive quiz n
 - **💡 Spotlight Discussions** - Facilitate in-depth Q&A sessions with participants
 - **💻 Code Analysis** - Show code snippets for bug finding or language identification
 - **🎓 Explain-To Challenges** - Explain technical topics to specific audiences (Oma, 5-year-old, etc.)
+- **✨ Visual Glow Effects** - Subtle color-coded glow behind content for each task type
 - **🎨 Clean, Professional UI** - High-contrast design optimized for projector visibility
 - **⌨️ Simple Navigation** - Arrow keys to move between tasks, ESC to quit
 - **📁 External Task Storage** - Edit tasks in JSON without touching code
@@ -237,6 +238,13 @@ Edit `config/settings.py` to customize:
 - **Colors** - Full color palette with semantic names
 - **Fonts** - Font families and sizes
 - **Spacing** - Padding, margins, layout
+- **Glow Effect** - Enable/disable, intensity, radius
+  ```python
+  GLOW_ENABLED = True      # Set to False to disable
+  GLOW_RADIUS = 100        # Size of glow (50-200 recommended)
+  GLOW_INTENSITY = 40      # Transparency (20-60 recommended)
+  GLOW_LAYERS = 5          # Smoothness (3-7 recommended)
+  ```
 
 ### Adding New Task Types
 

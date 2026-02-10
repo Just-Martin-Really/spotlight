@@ -23,7 +23,27 @@ class ExplainToRenderer(BaseRenderer):
     - Topic in large text
     - Optional note with hints
     - Purple accent color for creative/communication theme
+    - Purple glow effect behind content
     """
+
+    def get_glow_config(self, task: ExplainToTask) -> dict:
+        """
+        Configure purple glow for explain-to tasks.
+
+        Args:
+            task: ExplainToTask object
+
+        Returns:
+            Glow configuration dictionary
+        """
+        EXPLAIN_ACCENT_COLOR = (168, 85, 247)  # Purple-500
+
+        return {
+            'color': EXPLAIN_ACCENT_COLOR,
+            'x': self.screen_rect.width // 2,
+            'y': self.screen_rect.height // 2,
+            'cache_key': 'explain_to'
+        }
 
     def render_content(self, task: ExplainToTask) -> None:
         """

@@ -1,5 +1,5 @@
 """
-Base renderer for Spotlight.
+Base renderer for TIA25 Spotlight.
 
 Provides common rendering infrastructure for all task types.
 Implements Template Method pattern - subclasses override render_content().
@@ -17,26 +17,26 @@ from src.services.renderer_utils import draw_text_centered
 class BaseRenderer(ABC):
     """
     Abstract base class for all task renderers.
-    
+
     Handles screen setup, background, header/footer, and provides
     template method for content rendering.
-    
+
     Subclasses must implement render_content() for task-specific layout.
     """
-    
+
     def __init__(self, screen: pygame.Surface):
         """
         Initialize the renderer.
-        
+
         Args:
             screen: Pygame display surface to render on
         """
         self.screen = screen
         self.screen_rect = screen.get_rect()
-        
+
         # Initialize fonts (cached for performance)
         self._init_fonts()
-    
+
     def _init_fonts(self) -> None:
         """Initialize all fonts used by renderers."""
         try:
@@ -69,52 +69,81 @@ class BaseRenderer(ABC):
             self.font_body = pygame.font.Font(None, settings.FONT_SIZE_BODY)
             self.font_small = pygame.font.Font(None, settings.FONT_SIZE_SMALL)
             self.font_tiny = pygame.font.Font(None, settings.FONT_SIZE_TINY)
-    
+
     def render(self, task: BaseTask, position_info: str) -> None:
         """
         Render a complete frame with task content.
-        
+
         Template method - defines the overall rendering sequence:
         1. Clear screen with background
-        2. Render header
+        2. Render glow effect (if enabled)
         3. Render task-specific content (delegated to subclass)
         4. Render footer with navigation
-        
+
         Args:
             task: Task object to render
             position_info: Current position string (e.g., "3 / 12")
         """
         # Clear screen
         self.screen.fill(settings.COLOR_BACKGROUND)
-        
+
+        # Render glow effect before content
+        # Subclasses can override get_glow_config() to customize
+        glow_config = self.get_glow_config(task)
+        if glow_config:
+            from src.services.glow_effect import render_glow
+            render_glow(
+                self.screen,
+                glow_config['color'],
+                glow_config['x'],
+                glow_config['y'],
+                glow_config.get('cache_key')
+            )
+
         # Render task-specific content (implemented by subclass)
         self.render_content(task)
-        
+
         # Render footer with navigation info
         self._render_footer(position_info)
-    
+
+    def get_glow_config(self, task: BaseTask) -> dict:
+        """
+        Get glow configuration for this task type.
+
+        Subclasses should override to provide custom glow settings.
+
+        Args:
+            task: Task object
+
+        Returns:
+            Dictionary with 'color', 'x', 'y', and optional 'cache_key',
+            or None to disable glow
+        """
+        # Default: no glow (subclasses override)
+        return None
+
     @abstractmethod
     def render_content(self, task: BaseTask) -> None:
         """
         Render task-specific content.
-        
+
         This method must be implemented by subclasses to provide
         custom layout for different task types.
-        
+
         Args:
             task: Task object to render
         """
         pass
-    
+
     def _render_footer(self, position_info: str) -> None:
         """
         Render footer with navigation hints and position.
-        
+
         Args:
             position_info: Position string like "3 / 12"
         """
         footer_y = self.screen_rect.height - settings.PADDING_LARGE
-        
+
         # Navigation hints
         nav_text = "◄ Zurück  |  Weiter ►  |  ESC = Beenden"
         draw_text_centered(
@@ -124,7 +153,7 @@ class BaseRenderer(ABC):
             settings.COLOR_TEXT_MUTED,
             footer_y - 40
         )
-        
+
         # Position indicator
         draw_text_centered(
             self.screen,

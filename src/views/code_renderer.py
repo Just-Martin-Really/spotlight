@@ -24,7 +24,28 @@ class CodeRenderer(BaseRenderer):
     - Code in monospace font in bordered box
     - Optional note below code
     - Orange/yellow accent color for coding theme
+    - Orange glow effect behind content
     """
+
+    def get_glow_config(self, task: CodeTask) -> dict:
+        """
+        Configure orange glow for code tasks.
+
+        Args:
+            task: CodeTask object
+
+        Returns:
+            Glow configuration dictionary
+        """
+        # Using the same orange as the code box border
+        CODE_ACCENT_COLOR = (251, 146, 60)  # Orange-400
+
+        return {
+            'color': CODE_ACCENT_COLOR,
+            'x': self.screen_rect.width // 2,
+            'y': self.screen_rect.height // 2,
+            'cache_key': 'code'
+        }
 
     def render_content(self, task: CodeTask) -> None:
         """
