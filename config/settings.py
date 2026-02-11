@@ -95,7 +95,7 @@ DISCUSSION_TIMER_COLOR = COLOR_ACCENT_DISCUSSION
 
 # Glow effect settings
 GLOW_ENABLED = True  # Set to False to disable glow for performance
-GLOW_INTENSITY = 100  # Alpha value (5-30 recommended for subtle background glow)
+GLOW_INTENSITY = 150  # Alpha value (5-30 recommended for subtle background glow)
 
 # Note: GLOW_RADIUS and GLOW_LAYERS are not used in background glow mode
 # The glow automatically covers the entire screen with a radial gradient
