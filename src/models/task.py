@@ -1,5 +1,5 @@
 """
-Task data models for TIA25 Spotlight.
+Task data models for Spotlight.
 
 Defines typed data structures for different task types using Python dataclasses.
 Provides factory method for deserializing JSON data into appropriate task objects.

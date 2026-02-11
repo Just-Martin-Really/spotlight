@@ -1,5 +1,5 @@
 """
-Base renderer for TIA25 Spotlight.
+Base renderer for Spotlight.
 
 Provides common rendering infrastructure for all task types.
 Implements Template Method pattern - subclasses override render_content().

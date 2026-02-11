@@ -1,5 +1,5 @@
 """
-Glow effect service for TIA25 Spotlight.
+Glow effect service for Spotlight.
 
 Provides subtle background glow effect behind content.
 Creates a large, soft gradient overlay across the screen.

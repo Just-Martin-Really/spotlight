@@ -1,5 +1,5 @@
 """
-Discussion task renderer for TIA25 Spotlight.
+Discussion task renderer for Spotlight.
 
 Renders open discussion prompts with optional time allocation.
 Uses green accent color to indicate collaborative format.

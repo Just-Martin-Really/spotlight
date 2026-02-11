@@ -105,7 +105,7 @@ spotlight/
 ### 2. Terminal öffnen
 
 ```bash
-cd tia25-spotlight
+cd spotlight
 ```
 
 ### 3. Virtual Environment erstellen
@@ -145,7 +145,7 @@ python verify_install.py
 Erwartete Ausgabe:
 ```
 ============================================================
-TIA25 Spotlight - Installation Verification
+Spotlight - Installation Verification
 ============================================================
 
 ✓ Checking Python version...

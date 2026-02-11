@@ -1,5 +1,5 @@
 """
-Explain-to-audience task renderer for TIA25 Spotlight.
+Explain-to-audience task renderer for Spotlight.
 
 Renders challenges where participants must explain technical topics
 to specific audiences (grandmother, 5-year-old, etc.).

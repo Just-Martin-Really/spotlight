@@ -1,5 +1,5 @@
 """
-Code task renderer for TIA25 Spotlight.
+Code task renderer for Spotlight.
 
 Renders code snippets with questions like "Find the bug" or
 "Which programming language is this?". Uses monospace font without
