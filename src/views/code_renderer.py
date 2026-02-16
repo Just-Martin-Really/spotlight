@@ -13,6 +13,8 @@ from config import settings
 from src.models.task import CodeTask
 from src.views.base_renderer import BaseRenderer
 from src.services.renderer_utils import draw_text_centered_shadow
+from src.services.ui_metrics import pad_large, pad_medium, border_width
+from src.services.ui_scale import ui_scale
 
 
 class CodeRenderer(BaseRenderer):
@@ -30,7 +32,7 @@ class CodeRenderer(BaseRenderer):
         if not hasattr(self, "font_mono"):
             self._init_mono_font()
 
-        start_y = settings.PADDING_LARGE + 50
+        start_y = pad_large() + ui_scale(50)
 
         draw_text_centered_shadow(
             self.screen,
@@ -40,14 +42,15 @@ class CodeRenderer(BaseRenderer):
             start_y,
         )
 
-        code_start_y = start_y + settings.FONT_SIZE_SUBTITLE + settings.PADDING_LARGE
+        code_start_y = start_y + self.font_subtitle.get_linesize() + pad_large()
+
         self._render_code_box(task.code, code_start_y)
 
         if task.note:
-            note_y = self.screen_rect.height - settings.PADDING_LARGE - 150
+            note_y = self.screen_rect.height - pad_large() - ui_scale(150)
             draw_text_centered_shadow(
                 self.screen,
-                f"💡 {task.note}",
+                f"NOTE: {task.note}",
                 self.font_body,
                 settings.COLOR_TEXT_MUTED,
                 note_y,
@@ -58,18 +61,18 @@ class CodeRenderer(BaseRenderer):
         try:
             self.font_mono = pygame.font.SysFont(
                 settings.FONT_FAMILY_MONO,
-                settings.FONT_SIZE_BODY,
+                ui_scale(settings.FONT_SIZE_BODY),
                 bold=False,
             )
         except Exception:
-            self.font_mono = pygame.font.Font(None, settings.FONT_SIZE_BODY)
+            self.font_mono = pygame.font.Font(None, ui_scale(settings.FONT_SIZE_BODY))
 
     def _render_code_box(self, code: str, start_y: int) -> None:
         """Render code in a bordered box with monospace font."""
         code_lines = code.split("\n")
 
         line_height = self.font_mono.get_linesize()
-        box_padding = settings.PADDING_MEDIUM
+        box_padding = pad_medium()
 
         rendered_lines = []
         max_line_width = 0
@@ -82,7 +85,7 @@ class CodeRenderer(BaseRenderer):
 
         box_width = min(
             max_line_width + (box_padding * 2),
-            self.screen_rect.width - (settings.PADDING_LARGE * 2),
+            self.screen_rect.width - (pad_large() * 2),
         )
         box_height = (len(code_lines) * line_height) + (box_padding * 2)
 
@@ -94,7 +97,7 @@ class CodeRenderer(BaseRenderer):
             self.screen,
             settings.COLOR_ACCENT_CODE,
             box_rect,
-            settings.BORDER_WIDTH,
+            border_width(),
         )
 
         current_y = start_y + box_padding

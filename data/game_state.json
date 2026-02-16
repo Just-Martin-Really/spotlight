@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "teams": [
+    {
+      "name": "Team A",
+      "score": 0
+    },
+    {
+      "name": "Team B",
+      "score": 0
+    },
+    {
+      "name": "Team C",
+      "score": 0
+    },
+    {
+      "name": "Team D",
+      "score": 0
+    }
+  ],
+  "buzz": {
+    "state": "open",
+    "locked_team": null
+  },
+  "timer": {
+    "mode": "stopwatch",
+    "running": false,
+    "elapsed_ms": 0,
+    "target_ms": null
+  }
+}

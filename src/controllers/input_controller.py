@@ -7,74 +7,121 @@ Decouples pygame event handling from business logic.
 Design principle: Controller pattern - mediates between UI and model.
 """
 
+from __future__ import annotations
+
 import pygame
-from src.models.session import Session
+
 from config import keybindings
+from src.controllers.commands import Command, CommandType
+from src.models.session import Session
 
 
 class InputController:
-    """
-    Handles keyboard input and translates it to session actions.
-    
-    Implements Command pattern - each key press triggers a specific
-    action on the session object.
-    """
-    
+    """Handles keyboard input and translates it into session/app commands."""
+
     def __init__(self, session: Session):
-        """
-        Initialize the input controller.
-        
-        Args:
-            session: Session object to control
-        """
         self.session = session
-    
-    def handle_events(self) -> bool:
-        """
-        Process all pending pygame events.
-        
-        Polls the event queue and translates relevant events
-        (keyboard input) into session state changes.
-        
+        self._buzz_open_mode = False
+
+    def poll_commands(self) -> tuple[bool, list[Command]]:
+        """Process pending pygame events.
+
         Returns:
-            True if application should continue running,
-            False if quit was requested
+            (running, commands)
         """
+        commands: list[Command] = []
+
         for event in pygame.event.get():
-            # Handle window close button
             if event.type == pygame.QUIT:
-                return False
-            
-            # Handle keyboard input
+                return False, [Command(CommandType.QUIT)]
+
             if event.type == pygame.KEYDOWN:
-                if not self._handle_keydown(event.key):
-                    return False
-        
-        return True
-    
-    def _handle_keydown(self, key: int) -> bool:
-        """
-        Handle a key press event.
-        
-        Args:
-            key: Pygame key constant
-            
-        Returns:
-            True to continue running, False to quit
-        """
-        # Quit application
+                cmd = self._map_keydown(event)
+                if cmd is not None:
+                    if cmd.type == CommandType.QUIT:
+                        return False, [cmd]
+                    commands.append(cmd)
+
+        return True, commands
+
+    def _map_keydown(self, event: pygame.event.Event) -> Command | None:
+        key = event.key
+
         if key == keybindings.KEY_QUIT:
-            return False
-        
-        # Navigate to next task
-        elif key == keybindings.KEY_NEXT:
+            return Command(CommandType.QUIT)
+
+        if key == keybindings.KEY_NEXT:
             self.session.next_task()
-        
-        # Navigate to previous task
-        elif key == keybindings.KEY_PREV:
+            return Command(CommandType.NEXT)
+
+        if key == keybindings.KEY_PREV:
             self.session.prev_task()
-        
-        # Unknown key - ignore
-        # (We don't handle every possible key, only mapped ones)
-        
-        return True
+            return Command(CommandType.PREV)
+
+        # Buzz-in open / reset
+        if key == keybindings.KEY_BUZZ_OPEN:
+            self._buzz_open_mode = True
+            return Command(CommandType.BUZZ_OPEN)
+
+        if key == keybindings.KEY_BUZZ_RESET:
+            self._buzz_open_mode = False
+            return Command(CommandType.BUZZ_RESET)
+
+        if key == keybindings.KEY_BUZZ_FAIL:
+            self._buzz_open_mode = False
+            return Command(CommandType.BUZZ_FAIL)
+
+        # Team selection / buzz: 1..9
+        team_keys = {
+            keybindings.KEY_TEAM_1: 0,
+            keybindings.KEY_TEAM_2: 1,
+            keybindings.KEY_TEAM_3: 2,
+            keybindings.KEY_TEAM_4: 3,
+            keybindings.KEY_TEAM_5: 4,
+            keybindings.KEY_TEAM_6: 5,
+            keybindings.KEY_TEAM_7: 6,
+            keybindings.KEY_TEAM_8: 7,
+            keybindings.KEY_TEAM_9: 8,
+        }
+        if key in team_keys:
+            team_index = team_keys[key]
+            if self._buzz_open_mode:
+                # First team number after opening buzz counts as "buzz".
+                # Application will decide whether it locks based on GameState.
+                self._buzz_open_mode = False
+                return Command(CommandType.BUZZ, team_index=team_index)
+            return Command(CommandType.SELECT_TEAM, team_index=team_index)
+
+        if key == keybindings.KEY_AWARD:
+            return Command(CommandType.AWARD)
+
+        if key == keybindings.KEY_PENALTY:
+            return Command(CommandType.PENALTY)
+
+        if key == keybindings.KEY_TIMER_TOGGLE:
+            return Command(CommandType.TIMER_TOGGLE)
+
+        if key == keybindings.KEY_TIMER_RESET:
+            return Command(CommandType.TIMER_RESET)
+
+        if key == keybindings.KEY_TOGGLE_ROSTER:
+            return Command(CommandType.TOGGLE_ROSTER)
+
+        if key == keybindings.KEY_TOGGLE_HELP:
+            return Command(CommandType.TOGGLE_HELP)
+
+        if key == keybindings.KEY_SAVE:
+            return Command(CommandType.SAVE)
+
+        if key == keybindings.KEY_LOAD:
+            return Command(CommandType.LOAD)
+
+        if key == keybindings.KEY_TOGGLE_REVEAL:
+            return Command(CommandType.TOGGLE_REVEAL)
+
+        return None
+
+    # Backward-compatible API
+    def handle_events(self) -> bool:
+        running, _ = self.poll_commands()
+        return running

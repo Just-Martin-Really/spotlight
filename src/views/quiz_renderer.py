@@ -7,11 +7,12 @@ Uses blue accent color to distinguish from other task types.
 Design principle: Single responsibility - only renders quiz tasks.
 """
 
-import pygame
 from config import settings
+
 from src.models.task import QuizTask
 from src.views.base_renderer import BaseRenderer
 from src.services.renderer_utils import wrap_text, draw_text_centered_shadow
+from src.services.ui_metrics import content_center_y_offset, content_max_width, pad_large, pad_medium, pad_small
 
 
 class QuizRenderer(BaseRenderer):
@@ -27,8 +28,8 @@ class QuizRenderer(BaseRenderer):
         assert isinstance(task, QuizTask), "QuizRenderer requires QuizTask"
 
         max_width = min(
-            settings.CONTENT_MAX_WIDTH,
-            self.screen_rect.width - (settings.PADDING_LARGE * 2),
+            content_max_width(),
+            self.screen_rect.width - (pad_large() * 2),
         )
 
         # Hard-wrap to avoid projector overflow on long tokens/URLs
@@ -36,11 +37,12 @@ class QuizRenderer(BaseRenderer):
 
         question_start_y = (
             self.screen_rect.height // 2
-            + settings.CONTENT_CENTER_Y_OFFSET
-            - (len(question_lines) * settings.FONT_SIZE_TITLE // 2)
+            + content_center_y_offset()
+            - (len(question_lines) * self.font_title.get_linesize() // 2)
         )
 
         current_y = question_start_y
+        line_h = self.font_title.get_linesize()
         for line in question_lines:
             draw_text_centered_shadow(
                 self.screen,
@@ -49,11 +51,12 @@ class QuizRenderer(BaseRenderer):
                 settings.COLOR_ACCENT_QUIZ,
                 current_y,
             )
-            current_y += settings.FONT_SIZE_TITLE + settings.PADDING_SMALL
+            current_y += line_h + pad_small()
 
         if task.note:
-            current_y += settings.PADDING_MEDIUM
+            current_y += pad_medium()
             note_lines = wrap_text(task.note, self.font_body, max_width, hard_wrap=True)
+            body_h = self.font_body.get_linesize()
 
             for line in note_lines:
                 draw_text_centered_shadow(
@@ -63,4 +66,4 @@ class QuizRenderer(BaseRenderer):
                     settings.QUIZ_NOTE_COLOR,
                     current_y,
                 )
-                current_y += settings.FONT_SIZE_BODY + settings.PADDING_SMALL
+                current_y += body_h + pad_small()

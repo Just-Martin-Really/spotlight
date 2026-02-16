@@ -12,6 +12,9 @@ import pygame
 from config import settings
 from src.models.task import BaseTask
 from src.services.renderer_utils import draw_text_centered
+from src.services.ui_scale import ui_scale
+from src.services.ui_metrics import pad_large
+from typing import Any
 
 
 class BaseRenderer(ABC):
@@ -42,33 +45,33 @@ class BaseRenderer(ABC):
         try:
             self.font_title = pygame.font.SysFont(
                 settings.FONT_FAMILY_PRIMARY,
-                settings.FONT_SIZE_TITLE,
-                bold=True
+                ui_scale(settings.FONT_SIZE_TITLE),
+                bold=True,
             )
             self.font_subtitle = pygame.font.SysFont(
                 settings.FONT_FAMILY_PRIMARY,
-                settings.FONT_SIZE_SUBTITLE
+                ui_scale(settings.FONT_SIZE_SUBTITLE),
             )
             self.font_body = pygame.font.SysFont(
                 settings.FONT_FAMILY_PRIMARY,
-                settings.FONT_SIZE_BODY
+                ui_scale(settings.FONT_SIZE_BODY),
             )
             self.font_small = pygame.font.SysFont(
                 settings.FONT_FAMILY_PRIMARY,
-                settings.FONT_SIZE_SMALL
+                ui_scale(settings.FONT_SIZE_SMALL),
             )
             self.font_tiny = pygame.font.SysFont(
                 settings.FONT_FAMILY_PRIMARY,
-                settings.FONT_SIZE_TINY
+                ui_scale(settings.FONT_SIZE_TINY),
             )
         except Exception as e:
             # Fallback to pygame default font if system fonts fail
             print(f"Warning: Could not load system fonts, using defaults: {e}")
-            self.font_title = pygame.font.Font(None, settings.FONT_SIZE_TITLE)
-            self.font_subtitle = pygame.font.Font(None, settings.FONT_SIZE_SUBTITLE)
-            self.font_body = pygame.font.Font(None, settings.FONT_SIZE_BODY)
-            self.font_small = pygame.font.Font(None, settings.FONT_SIZE_SMALL)
-            self.font_tiny = pygame.font.Font(None, settings.FONT_SIZE_TINY)
+            self.font_title = pygame.font.Font(None, ui_scale(settings.FONT_SIZE_TITLE))
+            self.font_subtitle = pygame.font.Font(None, ui_scale(settings.FONT_SIZE_SUBTITLE))
+            self.font_body = pygame.font.Font(None, ui_scale(settings.FONT_SIZE_BODY))
+            self.font_small = pygame.font.Font(None, ui_scale(settings.FONT_SIZE_SMALL))
+            self.font_tiny = pygame.font.Font(None, ui_scale(settings.FONT_SIZE_TINY))
 
     def render(self, task: BaseTask, position_info: str) -> None:
         """
@@ -90,12 +93,13 @@ class BaseRenderer(ABC):
         # Render glow effect before content
         # Subclasses can override get_glow_config() to customize
         glow_config = self.get_glow_config(task)
-        if glow_config:
+        if glow_config is not None:
             from src.services.glow_effect import render_glow
+            cfg: dict[str, Any] = glow_config
             render_glow(
                 self.screen,
-                glow_config['color'],
-                glow_config.get('cache_key')
+                cfg["color"],
+                cfg.get("cache_key"),
             )
 
         # Render task-specific content (implemented by subclass)
@@ -104,20 +108,12 @@ class BaseRenderer(ABC):
         # Render footer with navigation info
         self._render_footer(position_info)
 
-    def get_glow_config(self, task: BaseTask) -> dict:
-        """
-        Get glow configuration for this task type.
-
-        Subclasses should override to provide custom glow settings.
-
-        Args:
-            task: Task object
+    def get_glow_config(self, task: BaseTask):
+        """Get glow configuration for this task type.
 
         Returns:
-            Dictionary with 'color' and optional 'cache_key',
-            or None to disable glow
+            dict with 'color' and optional 'cache_key', or None to disable glow.
         """
-        # Default: no glow (subclasses override)
         return None
 
     @abstractmethod
@@ -134,23 +130,14 @@ class BaseRenderer(ABC):
         pass
 
     def _render_footer(self, position_info: str) -> None:
-        """
-        Render footer with navigation hints and position.
+        """Render footer with position info
+
+        Navigation/help hints are shown via the Help overlay (H) in WOW mode.
 
         Args:
             position_info: Position string like "3 / 12"
         """
-        footer_y = self.screen_rect.height - settings.PADDING_LARGE
-
-        # Navigation hints
-        nav_text = "◄ Zurück  |  Weiter ►  |  ESC = Beenden"
-        draw_text_centered(
-            self.screen,
-            nav_text,
-            self.font_tiny,
-            settings.COLOR_TEXT_MUTED,
-            footer_y - 40
-        )
+        footer_y = self.screen_rect.height - pad_large()
 
         # Position indicator
         draw_text_centered(

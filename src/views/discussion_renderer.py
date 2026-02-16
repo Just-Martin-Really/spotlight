@@ -7,11 +7,11 @@ Uses green accent color to indicate collaborative format.
 Design principle: Inviting, open layout for audience participation.
 """
 
-import pygame
 from config import settings
 from src.models.task import DiscussionTask
 from src.views.base_renderer import BaseRenderer
 from src.services.renderer_utils import wrap_text, draw_text_centered
+from src.services.ui_metrics import content_center_y_offset, content_max_width, pad_large, pad_medium, pad_small
 
 
 class DiscussionRenderer(BaseRenderer):
@@ -52,8 +52,8 @@ class DiscussionRenderer(BaseRenderer):
 
         # Calculate available width for text
         max_width = min(
-            settings.CONTENT_MAX_WIDTH,
-            self.screen_rect.width - (settings.PADDING_LARGE * 2)
+            content_max_width(),
+            self.screen_rect.width - (pad_large() * 2)
         )
 
         # Wrap prompt text
@@ -61,19 +61,23 @@ class DiscussionRenderer(BaseRenderer):
 
         # Calculate vertical position
         # Center the entire content block (prompt + duration)
-        total_height = len(prompt_lines) * settings.FONT_SIZE_TITLE
+        title_h = self.font_title.get_linesize()
+        subtitle_h = self.font_subtitle.get_linesize()
+        small_h = self.font_small.get_linesize()
+
+        total_height = len(prompt_lines) * title_h
 
         # Add space for duration if present
         if task.spotlight_duration:
-            total_height += settings.PADDING_LARGE + settings.FONT_SIZE_SUBTITLE
+            total_height += pad_large() + subtitle_h
 
         prompt_start_y = (
             (self.screen_rect.height - total_height) // 2 +
-            settings.CONTENT_CENTER_Y_OFFSET
+            content_center_y_offset()
         )
 
         # Render "Spotlight" label
-        label_y = prompt_start_y - settings.FONT_SIZE_SMALL - settings.PADDING_MEDIUM
+        label_y = prompt_start_y - small_h - pad_medium()
         draw_text_centered(
             self.screen,
             "Spotlight Diskussion",
@@ -92,13 +96,13 @@ class DiscussionRenderer(BaseRenderer):
                 settings.COLOR_TEXT_PRIMARY,
                 current_y
             )
-            current_y += settings.FONT_SIZE_TITLE + settings.PADDING_SMALL
+            current_y += title_h + pad_small()
 
         # Render duration if present
         if task.spotlight_duration:
-            current_y += settings.PADDING_MEDIUM
+            current_y += pad_medium()
 
-            duration_text = f"️{task.spotlight_duration}"
+            duration_text = f"{task.spotlight_duration}"
             draw_text_centered(
                 self.screen,
                 duration_text,

@@ -12,6 +12,7 @@ from config import settings
 from src.models.task import TabuTask
 from src.views.base_renderer import BaseRenderer
 from src.services.renderer_utils import draw_text_centered, draw_bordered_box
+from src.services.ui_metrics import content_center_y_offset, content_max_width, pad_large, pad_medium, pad_small, border_width
 
 
 class TabuRenderer(BaseRenderer):
@@ -40,20 +41,18 @@ class TabuRenderer(BaseRenderer):
             'cache_key': 'tabu'
         }
 
-    def render_content(self, task: TabuTask) -> None:
-        """
-        Render topic and forbidden words list.
-
-        Args:
-            task: TabuTask object to render
-        """
-        # Type hint for better IDE support
+    def render_content(self, task: TabuTask, hidden: bool = False) -> None:
+        """Render topic and forbidden words list, or a safe placeholder."""
         assert isinstance(task, TabuTask), "TabuRenderer requires TabuTask"
+
+        if hidden:
+            self._render_placeholder()
+            return
 
         # Calculate vertical spacing
         start_y = (
             self.screen_rect.height // 2 +
-            settings.CONTENT_CENTER_Y_OFFSET - 200
+            content_center_y_offset() - pad_large() * 2
         )
 
         # Render topic
@@ -66,7 +65,7 @@ class TabuRenderer(BaseRenderer):
         )
 
         # Spacing before forbidden words section
-        forbidden_y = start_y + settings.FONT_SIZE_TITLE + settings.PADDING_LARGE
+        forbidden_y = start_y + self.font_title.get_linesize() + pad_large()
 
         # Render "Forbidden words" label
         draw_text_centered(
@@ -80,7 +79,29 @@ class TabuRenderer(BaseRenderer):
         # Render forbidden words in a box
         self._render_forbidden_box(
             task.forbidden_words,
-            forbidden_y + settings.FONT_SIZE_SUBTITLE + settings.PADDING_MEDIUM
+            forbidden_y + self.font_subtitle.get_linesize() + pad_medium()
+        )
+
+    def _render_placeholder(self) -> None:
+        """Render a safe placeholder screen for hidden Tabu tasks."""
+        start_y = (
+            self.screen_rect.height // 2 +
+            content_center_y_offset() - pad_large()
+        )
+
+        draw_text_centered(
+            self.screen,
+            "Tabu",
+            self.font_title,
+            settings.COLOR_TEXT_PRIMARY,
+            start_y,
+        )
+        draw_text_centered(
+            self.screen,
+            "Press V to reveal",
+            self.font_body,
+            settings.COLOR_TEXT_MUTED,
+            start_y + self.font_title.get_linesize() + pad_medium(),
         )
 
     def _render_forbidden_box(self, words: list, start_y: int) -> None:
@@ -96,8 +117,8 @@ class TabuRenderer(BaseRenderer):
 
         # Calculate box dimensions
         max_width = min(
-            settings.CONTENT_MAX_WIDTH,
-            self.screen_rect.width - (settings.PADDING_LARGE * 2)
+            content_max_width(),
+            self.screen_rect.width - (pad_large() * 2)
         )
 
         # Render word text
@@ -116,7 +137,7 @@ class TabuRenderer(BaseRenderer):
             line2 = "  •  ".join(words[mid:])
 
             # Render both lines
-            current_y = start_y + settings.PADDING_MEDIUM
+            current_y = start_y + pad_medium()
             for line in [line1, line2]:
                 draw_text_centered(
                     self.screen,
@@ -125,11 +146,12 @@ class TabuRenderer(BaseRenderer):
                     settings.COLOR_ACCENT_TABU,
                     current_y
                 )
-                current_y += settings.FONT_SIZE_BODY + settings.PADDING_SMALL
+                current_y += self.font_body.get_linesize() + pad_small()
+
         else:
-            # Render on single line
+            box_padding = pad_medium()
+
             # Create box around text
-            box_padding = settings.PADDING_MEDIUM
             box_width = word_surface.get_width() + (box_padding * 2)
             box_height = word_surface.get_height() + (box_padding * 2)
 
@@ -146,7 +168,7 @@ class TabuRenderer(BaseRenderer):
                 box_rect,
                 settings.COLOR_SURFACE,
                 settings.COLOR_ACCENT_TABU,
-                settings.BORDER_WIDTH
+                border_width()
             )
 
             # Draw text inside box

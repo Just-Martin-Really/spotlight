@@ -1,90 +1,108 @@
 [
   {
     "type": "quiz",
+    "difficulty": 3,
     "question": "Was ist die Zeitkomplexität von QuickSort im Average Case?",
     "note": "Diskutiere die Auswirkung der Pivot-Wahl auf die Performance"
   },
   {
     "type": "tabu",
+    "difficulty": 2,
     "topic": "Mengenlehre",
     "forbidden_words": ["Menge", "Gruppe", "Ring", "bijektiv", "Element"]
   },
   {
     "type": "discussion",
+    "difficulty": 1,
     "prompt": "Erkläre den Unterschied zwischen Stack und Queue",
     "spotlight_duration": "5 Minuten"
   },
   {
     "type": "quiz",
+    "difficulty": 3,
     "question": "Welche Datenstruktur würdest du für einen LRU-Cache verwenden?",
     "note": "Überlege dir die Zeitkomplexität für Get und Put"
   },
   {
     "type": "tabu",
+    "difficulty": 2,
     "topic": "Objektorientierte Programmierung",
     "forbidden_words": ["Klasse", "Objekt", "Vererbung", "Polymorphie", "Kapselung"]
   },
   {
     "type": "quiz",
+    "difficulty": 2,
     "question": "Was ist der Unterschied zwischen einem Compiler und einem Interpreter?"
   },
   {
     "type": "discussion",
+    "difficulty": 2,
     "prompt": "Warum ist funktionale Programmierung in modernen Systemen wichtig?",
     "spotlight_duration": "7 Minuten"
   },
   {
     "type": "tabu",
+    "difficulty": 2,
     "topic": "Datenbanken",
     "forbidden_words": ["SQL", "Tabelle", "Abfrage", "Index", "Transaktion"]
   },
   {
     "type": "quiz",
+    "difficulty": 3,
     "question": "Nenne drei Vorteile von Microservices gegenüber monolithischer Architektur",
     "note": "Denke auch an die Nachteile!"
   },
   {
     "type": "discussion",
+    "difficulty": 1,
     "prompt": "Wie würdest du einen Anfänger die Bedeutung von Git erklären?",
     "spotlight_duration": "4 Minuten"
   },
   {
     "type": "quiz",
+    "difficulty": 2,
     "question": "Was ist der Unterschied zwischen synchronem und asynchronem Code?"
   },
   {
     "type": "tabu",
+    "difficulty": 3,
     "topic": "Machine Learning",
     "forbidden_words": ["Modell", "Training", "Neuronales Netz", "KI", "Daten"]
   },
   {
     "type": "code",
+    "difficulty": 4,
     "code": "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n-1)",
     "question": "Erkenne den Fehler in diesem Code"
   },
   {
     "type": "explain_to",
+    "difficulty": 2,
     "topic": "Rekursion",
     "audience": "deiner Oma",
     "note": "Nutze ein alltägliches Beispiel"
   },
   {
     "type": "code",
+    "difficulty": 3,
     "code": "const greeting = name => {\n  return `Hello, ${name}!`;\n};",
     "question": "Welche Programmiersprache ist das?"
   },
   {
     "type": "explain_to",
+    "difficulty": 1,
     "topic": "Was ist eine API?",
     "audience": "einem 5-Jährigen"
   },
   {
     "type": "code",
+    "difficulty": 2,
     "code": "SELECT * FROM users\nWHERE age > 18\nORDER BY name ASC;",
     "question": "Welche Programmiersprache ist das?"
   },
   {
     "type": "explain_to",
+    "difficulty": 3,
     "topic": "Blockchain",
     "audience": "einer Versicherungsmaklerin",
     "note": "Fokus auf praktischen Nutzen"

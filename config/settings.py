@@ -9,10 +9,18 @@ Acts as Single Source of Truth for the entire application's appearance.
 # DISPLAY SETTINGS
 # =============================================================================
 
-SCREEN_WIDTH = 1920  # Full HD width
-SCREEN_HEIGHT = 1080  # Full HD height
+SCREEN_WIDTH = 2560   # Full HD width
+SCREEN_HEIGHT = 1664  # Full HD height
 FPS = 60  # Frames per second - smooth animations
 FULLSCREEN = True  # Set to False for windowed mode during development
+
+# Render at a higher internal resolution and scale down for better perceived quality.
+# 1.0 = off, 1.25..2.0 = sharper UI (at higher GPU/CPU cost).
+UI_RENDER_SCALE = 1.5
+
+# Global UI size multiplier for fonts/paddings/layout (independent from crispness).
+# Increase this if things look too small at high resolutions.
+UI_SCALE = 2.0
 
 # =============================================================================
 # COLOR PALETTE
@@ -101,3 +109,4 @@ GLOW_INTENSITY = 150  # Alpha value (100-200 recommended for subtle background g
 
 # Note: GLOW_RADIUS and GLOW_LAYERS are not used in background glow mode
 # The glow automatically covers the entire screen with a radial gradient
+

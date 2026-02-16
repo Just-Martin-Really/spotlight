@@ -19,9 +19,11 @@ class BaseTask:
     Attributes:
         type: Task category identifier (quiz, tabu, discussion)
         id: Unique identifier (auto-generated from index)
+        difficulty: Optional difficulty level (1-5) for the task
     """
     type: str
     id: Optional[int] = None
+    difficulty: Optional[int] = None  # required by loader/factory; kept Optional for compatibility
 
 
 @dataclass
@@ -153,6 +155,14 @@ class TaskFactory:
         if field in data and data[field] is not None and not isinstance(data[field], str):
             raise ValueError(f"Optional field '{field}' must be a string when provided")
 
+    @staticmethod
+    def _require_difficulty(data: Dict[str, Any]) -> None:
+        if "difficulty" not in data or data["difficulty"] is None:
+            raise ValueError("Field 'difficulty' is required (integer 1-5)")
+        value = data["difficulty"]
+        if not isinstance(value, int) or not (1 <= value <= 5):
+            raise ValueError("Field 'difficulty' must be an integer between 1 and 5")
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any], task_id: int) -> BaseTask:
         """
@@ -200,6 +210,8 @@ class TaskFactory:
             cls._require_non_empty_str(data, "topic")
             cls._require_non_empty_str(data, "audience")
             cls._optional_str(data, "note")
+
+        cls._require_difficulty(data)
 
         # Get the appropriate task class
         task_class = cls._TASK_CLASSES[task_type]
