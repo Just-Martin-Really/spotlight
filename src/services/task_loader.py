@@ -16,6 +16,7 @@ from src.models.task import BaseTask, TaskFactory
 
 class TaskLoadError(Exception):
     """Custom exception for task loading errors."""
+
     pass
 
 
@@ -54,7 +55,7 @@ class TaskLoader:
         
         # Read and parse JSON
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except json.JSONDecodeError as e:
             raise TaskLoadError(
@@ -84,7 +85,7 @@ class TaskLoader:
             try:
                 task = TaskFactory.from_dict(task_data, task_id=index)
                 tasks.append(task)
-            except ValueError as e:
+            except (ValueError, TypeError) as e:
                 raise TaskLoadError(
                     f"Invalid task at index {index}: {e}"
                 ) from e

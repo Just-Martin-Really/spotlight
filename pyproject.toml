@@ -34,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-spotlight = "src.core.application:main"
+spotlight = "src.cli:main"
 
 [tool.black]
 line-length = 100

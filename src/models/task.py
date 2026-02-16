@@ -126,6 +126,33 @@ class TaskFactory:
         "explain_to": ExplainToTask,
     }
 
+    _REQUIRED_FIELDS: Dict[str, List[str]] = {
+        "quiz": ["question"],
+        "tabu": ["topic", "forbidden_words"],
+        "discussion": ["prompt"],
+        "code": ["code", "question"],
+        "explain_to": ["topic", "audience"],
+    }
+
+    @staticmethod
+    def _require_non_empty_str(data: Dict[str, Any], field: str) -> None:
+        value = data.get(field)
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"Field '{field}' must be a non-empty string")
+
+    @staticmethod
+    def _require_str_list(data: Dict[str, Any], field: str) -> None:
+        value = data.get(field)
+        if not isinstance(value, list) or not value:
+            raise ValueError(f"Field '{field}' must be a non-empty array of strings")
+        if not all(isinstance(item, str) and item.strip() for item in value):
+            raise ValueError(f"Field '{field}' must contain only non-empty strings")
+
+    @staticmethod
+    def _optional_str(data: Dict[str, Any], field: str) -> None:
+        if field in data and data[field] is not None and not isinstance(data[field], str):
+            raise ValueError(f"Optional field '{field}' must be a string when provided")
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any], task_id: int) -> BaseTask:
         """
@@ -141,13 +168,38 @@ class TaskFactory:
         Raises:
             ValueError: If task type is unknown or required fields are missing
         """
+
+        if not isinstance(data, dict):
+            raise ValueError(f"Task must be an object, got: {type(data).__name__}")
+
         task_type = data.get("type")
+        if not isinstance(task_type, str) or not task_type.strip():
+            raise ValueError("Field 'type' must be a non-empty string")
 
         if task_type not in cls._TASK_CLASSES:
             raise ValueError(
                 f"Unknown task type: {task_type}. "
                 f"Valid types: {', '.join(cls._TASK_CLASSES.keys())}"
             )
+
+        # Per-type validation for required fields
+        if task_type == "quiz":
+            cls._require_non_empty_str(data, "question")
+            cls._optional_str(data, "note")
+        elif task_type == "tabu":
+            cls._require_non_empty_str(data, "topic")
+            cls._require_str_list(data, "forbidden_words")
+        elif task_type == "discussion":
+            cls._require_non_empty_str(data, "prompt")
+            cls._optional_str(data, "spotlight_duration")
+        elif task_type == "code":
+            cls._require_non_empty_str(data, "code")
+            cls._require_non_empty_str(data, "question")
+            cls._optional_str(data, "note")
+        elif task_type == "explain_to":
+            cls._require_non_empty_str(data, "topic")
+            cls._require_non_empty_str(data, "audience")
+            cls._optional_str(data, "note")
 
         # Get the appropriate task class
         task_class = cls._TASK_CLASSES[task_type]
@@ -157,9 +209,7 @@ class TaskFactory:
         task_data["id"] = task_id
 
         try:
-            # Instantiate the task (dataclass will validate required fields)
             return task_class(**task_data)
         except TypeError as e:
-            raise ValueError(
-                f"Invalid data for {task_type} task: {e}"
-            ) from e
+            raise ValueError(f"Invalid data for {task_type} task: {e}") from e
+
