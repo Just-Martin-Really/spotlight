@@ -31,6 +31,8 @@ COLOR_TEXT_MUTED = (148, 163, 184)  # Muted gray (slate-400)
 COLOR_ACCENT_QUIZ = (59, 130, 246)  # Blue-500 - Quiz questions
 COLOR_ACCENT_TABU = (239, 68, 68)  # Red-500 - Forbidden words
 COLOR_ACCENT_DISCUSSION = (34, 197, 94)  # Green-500 - Open discussion
+COLOR_ACCENT_CODE = (251, 146, 60)  # Orange-400 - Code analysis
+COLOR_ACCENT_EXPLAIN_TO = (168, 85, 247)  # Purple-500 - Explain-to challenges
 
 # UI elements
 COLOR_BORDER = (71, 85, 105)  # Slate-600

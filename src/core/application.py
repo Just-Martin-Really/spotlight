@@ -9,11 +9,9 @@ Design principle: High-level coordination, delegates to specialized components.
 
 import sys
 import pygame
-from pathlib import Path
 
 from config import settings
 from src.models.session import Session
-from src.models.task import QuizTask, TabuTask, DiscussionTask, CodeTask, ExplainToTask
 from src.services.task_loader import TaskLoader, TaskLoadError
 from src.controllers.input_controller import InputController
 from src.views.quiz_renderer import QuizRenderer
@@ -21,28 +19,13 @@ from src.views.tabu_renderer import TabuRenderer
 from src.views.discussion_renderer import DiscussionRenderer
 from src.views.code_renderer import CodeRenderer
 from src.views.explain_to_renderer import ExplainToRenderer
+from src.services.transitions import crossfade
 
 
 class Application:
-    """
-    Main application class - coordinates all subsystems.
-
-    Responsibilities:
-    - Initialize pygame
-    - Load tasks from JSON
-    - Create session
-    - Manage renderer factory
-    - Run main game loop
-    - Handle cleanup
-    """
+    """Main application class - coordinates all subsystems."""
 
     def __init__(self, task_file: str = "data/tasks.json"):
-        """
-        Initialize the application.
-
-        Args:
-            task_file: Path to JSON file containing tasks
-        """
         self.task_file = task_file
         self.screen = None
         self.clock = None
@@ -50,12 +33,14 @@ class Application:
         self.input_controller = None
         self.renderers = {}
 
-    def run(self) -> None:
-        """
-        Main entry point - initialize and start the game loop.
+        # Transition state
+        self._frame_surface = None
+        self._transition_prev = None
+        self._transition_next = None
+        self._transition_start_ms = None
+        self._last_task_index = 0
 
-        This is the only public method needed to run the entire application.
-        """
+    def run(self) -> None:
         try:
             self._initialize()
             self._game_loop()
@@ -71,119 +56,104 @@ class Application:
             self._cleanup()
 
     def _initialize(self) -> None:
-        """Initialize all subsystems."""
-        # Initialize pygame
         pygame.init()
 
-        # Create display
         if settings.FULLSCREEN:
             self.screen = pygame.display.set_mode(
                 (settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT),
-                pygame.FULLSCREEN
+                pygame.FULLSCREEN,
             )
         else:
-            self.screen = pygame.display.set_mode(
-                (settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
-            )
+            self.screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 
         pygame.display.set_caption("Spotlight")
-
-        # Create clock for FPS control
         self.clock = pygame.time.Clock()
 
-        # Load tasks
         tasks = TaskLoader.load_tasks(self.task_file)
         print(f"Loaded {len(tasks)} tasks")
 
-        # Create session
         self.session = Session(tasks)
-
-        # Create input controller
         self.input_controller = InputController(self.session)
 
-        # Initialize renderers (factory pattern)
+        # Offscreen surface for rendering frames (for transitions)
+        self._frame_surface = pygame.Surface(self.screen.get_size()).convert_alpha()
+
         self._init_renderers()
 
-    def _init_renderers(self) -> None:
-        """
-        Initialize renderer instances for all task types.
+        # Render initial frame into the buffer
+        self._last_task_index = self.session.current_index
+        self._transition_next = self._render_to_surface()
+        self.screen.blit(self._transition_next, (0, 0))
+        pygame.display.flip()
 
-        Creates a mapping from task types to their respective renderers.
-        This implements a simple factory pattern.
-        """
+    def _init_renderers(self) -> None:
         self.renderers = {
-            "quiz": QuizRenderer(self.screen),
-            "tabu": TabuRenderer(self.screen),
-            "discussion": DiscussionRenderer(self.screen),
-            "code": CodeRenderer(self.screen),
-            "explain_to": ExplainToRenderer(self.screen),
+            "quiz": QuizRenderer(self._frame_surface),
+            "tabu": TabuRenderer(self._frame_surface),
+            "discussion": DiscussionRenderer(self._frame_surface),
+            "code": CodeRenderer(self._frame_surface),
+            "explain_to": ExplainToRenderer(self._frame_surface),
         }
 
     def _game_loop(self) -> None:
-        """
-        Main game loop.
-
-        Runs until user quits:
-        1. Handle input
-        2. Render current task
-        3. Update display
-        4. Control frame rate
-        """
         running = True
 
         while running:
-            # Handle input events
             running = self.input_controller.handle_events()
 
-            # Render current task
             self._render_frame()
-
-            # Update display
             pygame.display.flip()
 
-            # Maintain frame rate
             self.clock.tick(settings.FPS)
 
-    def _render_frame(self) -> None:
-        """
-        Render a complete frame with the current task.
-
-        Selects appropriate renderer based on task type and
-        delegates rendering to it.
-        """
-        # Get current task
+    def _render_to_surface(self) -> pygame.Surface:
+        """Render current task to an offscreen surface and return a copy."""
         current_task = self.session.current_task()
-
-        # Get appropriate renderer for this task type
         renderer = self.renderers.get(current_task.type)
 
-        if renderer is None:
-            # Fallback for unknown task types
-            print(f"Warning: No renderer for task type '{current_task.type}'")
-            self._render_error(f"Unknown task type: {current_task.type}")
-            return
+        self._frame_surface.fill(settings.COLOR_BACKGROUND)
 
-        # Render the task
-        position_info = self.session.get_position_info()
-        renderer.render(current_task, position_info)
+        if renderer is None:
+            self._render_error(f"Unknown task type: {current_task.type}")
+        else:
+            position_info = self.session.get_position_info()
+            renderer.render(current_task, position_info)
+
+        return self._frame_surface.copy()
+
+    def _render_frame(self) -> None:
+        # Detect task change and start a transition
+        if self.session.current_index != self._last_task_index:
+            self._transition_prev = self._transition_next or self._render_to_surface()
+            self._transition_next = self._render_to_surface()
+            self._transition_start_ms = pygame.time.get_ticks()
+            self._last_task_index = self.session.current_index
+
+        # If a transition is active, blend frames
+        if self._transition_start_ms is not None and self._transition_prev is not None and self._transition_next is not None:
+            elapsed = pygame.time.get_ticks() - self._transition_start_ms
+            duration = max(1, int(settings.FADE_DURATION))
+            progress = min(1.0, max(0.0, elapsed / duration))
+
+            blended = crossfade(self._transition_prev, self._transition_next, progress)
+            self.screen.blit(blended, (0, 0))
+
+            if progress >= 1.0:
+                self._transition_start_ms = None
+                self._transition_prev = None
+        else:
+            # Normal render (no active transition)
+            frame = self._transition_next or self._render_to_surface()
+            self.screen.blit(frame, (0, 0))
 
     def _render_error(self, message: str) -> None:
-        """
-        Render an error message on screen.
-
-        Args:
-            message: Error message to display
-        """
-        self.screen.fill(settings.COLOR_BACKGROUND)
-
+        self._frame_surface.fill(settings.COLOR_BACKGROUND)
         font = pygame.font.Font(None, 48)
         text_surface = font.render(message, True, settings.COLOR_ACCENT_TABU)
-        text_rect = text_surface.get_rect(center=self.screen.get_rect().center)
-
-        self.screen.blit(text_surface, text_rect)
+        text_rect = text_surface.get_rect(center=self._frame_surface.get_rect().center)
+        self._frame_surface.blit(text_surface, text_rect)
 
     def _cleanup(self) -> None:
-        """Clean up resources and quit pygame."""
         pygame.quit()
         print("Application closed")
 
@@ -196,3 +166,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
