@@ -6,7 +6,7 @@ from src.models.task import QuizTask
 
 
 def test_award_blocked_team_does_not_consume_award() -> None:
-    session = Session([QuizTask(type="quiz", id=0, difficulty=2, question="Q")])
+    session = Session([QuizTask(type="quiz", id=0, category="Theo Inf", points=200, question="Q")])
     gs = GameState.with_teams(["A", "B"])
     scoring = ScoringState()
 
@@ -23,4 +23,3 @@ def test_award_blocked_team_does_not_consume_award() -> None:
     # Award to non-blocked team should work and then can be marked awarded
     assert award_points_for_current_task(session, gs, selected_team_index=1, now_ms=0) == 1
     assert scoring.mark_awarded(0) is True
-

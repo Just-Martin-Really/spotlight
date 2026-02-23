@@ -7,8 +7,8 @@ from src.models.task import QuizTask
 
 def test_award_lock_persists_across_circular_navigation() -> None:
     tasks = [
-        QuizTask(type="quiz", id=0, difficulty=1, question="Q0"),
-        QuizTask(type="quiz", id=1, difficulty=1, question="Q1"),
+        QuizTask(type="quiz", id=0, category="Theo Inf", points=100, question="Q0"),
+        QuizTask(type="quiz", id=1, category="Theo Inf", points=100, question="Q1"),
     ]
     session = Session(tasks)
     gs = GameState.with_teams(["A"])
@@ -25,4 +25,3 @@ def test_award_lock_persists_across_circular_navigation() -> None:
 
     # Still considered awarded
     assert scoring.is_awarded(0) is True
-

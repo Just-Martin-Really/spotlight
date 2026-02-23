@@ -9,6 +9,11 @@ Acts as Single Source of Truth for the entire application's appearance.
 # DISPLAY SETTINGS
 # =============================================================================
 
+# App mode:
+# - "slideshow": current deck-like flow
+# - "board": Jeopardy-style selection board (click to open tasks)
+APP_MODE = "slideshow"
+
 SCREEN_WIDTH = 2560   # Full HD width
 SCREEN_HEIGHT = 1664  # Full HD height
 FPS = 60  # Frames per second - smooth animations
@@ -125,3 +130,9 @@ GLOW_INTENSITY = 150  # Alpha value (100-200 recommended for subtle background g
 # Note: GLOW_RADIUS and GLOW_LAYERS are not used in background glow mode
 # The glow automatically covers the entire screen with a radial gradient
 
+# =============================================================================
+# DEBUG
+# =============================================================================
+
+# Enable extra runtime logging to diagnose freezes and input issues.
+DEBUG = False

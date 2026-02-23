@@ -19,6 +19,7 @@ class BaseTask:
         type: Task category identifier (quiz, tabu, discussion)
         id: Unique identifier (auto-generated from index)
         points: Points awarded for completing the task (100-500 in steps of 100)
+        category: Board category (e.g., "Mathe", "Theo Inf")
 
     Notes:
         Historically Spotlight used `difficulty` (1-5). We keep `difficulty` as an
@@ -28,6 +29,7 @@ class BaseTask:
     type: str
     id: Optional[int] = None
     points: Optional[int] = None
+    category: Optional[str] = None
     # Backwards compat only: may be present on older JSON files.
     difficulty: Optional[int] = None
 
@@ -185,6 +187,11 @@ class TaskFactory:
         if not isinstance(value, int) or value not in {100, 200, 300, 400, 500}:
             raise ValueError("Field 'points' must be one of: 100, 200, 300, 400, 500")
 
+    @staticmethod
+    def _require_category(data: Dict[str, Any]) -> None:
+        # Required for all tasks (Option A) so board mode can always be used.
+        TaskFactory._require_non_empty_str(data, "category")
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any], task_id: int) -> BaseTask:
         """Create a task object from dictionary data.
@@ -232,6 +239,7 @@ class TaskFactory:
             cls._require_non_empty_str(data, "audience")
             cls._optional_str(data, "note")
 
+        cls._require_category(data)
         cls._require_points(data)
 
         # Get the appropriate task class

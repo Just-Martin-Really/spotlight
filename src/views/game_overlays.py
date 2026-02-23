@@ -159,7 +159,13 @@ def draw_roster_overlay(
         y += s.get_height() + 6
 
 
-def draw_help_overlay(surface: pygame.Surface, font: pygame.font.Font) -> None:
+def draw_help_overlay(
+    surface: pygame.Surface,
+    font: pygame.font.Font,
+    *,
+    enable_game_show: bool = True,
+    enable_board: bool = False,
+) -> None:
     w, h = surface.get_size()
     box_w = min(content_max_width(), w - 2 * pad_large())
     box_h = int(h * 0.55)
@@ -172,22 +178,38 @@ def draw_help_overlay(surface: pygame.Surface, font: pygame.font.Font) -> None:
     surface.blit(overlay, (box_x, box_y))
     pygame.draw.rect(surface, settings.COLOR_BORDER, box, border_width())
 
-    lines = [
-        "HELP (H to close)",
-        "← / →  : previous / next task",
-        "1..9   : select team (disabled while BUZZ LOCKED)",
-        "B      : open buzz",
-        "R      : reset buzz",
-        "F      : fail (reopen buzz + block team for this task)",
-        "V      : reveal/hide (Tabu + notes/answers)",
-        "ENTER  : award points (= task points)",
-        "\\     : penalty (subtract task points)",
-        "SPACE  : timer start/pause",
-        "BACKSP : timer reset",
-        "TAB    : roster",
-        "S / L  : save / load",
-        "ESC    : quit",
-    ]
+    if enable_board:
+        lines = [
+            "HELP (H to close)",
+            "Click  : open question",
+            "M      : mark solved (close + gray out)",
+            "BACKSP : back to board",
+            "V      : reveal/hide (Tabu + notes/answers)",
+            "SPACE  : timer start/pause",
+            "BACKSP : timer reset (when on board)",
+            "ESC    : quit",
+        ]
+    else:
+        lines = [
+            "HELP (H to close)",
+            "← / →  : previous / next task",
+            "V      : reveal/hide (Tabu + notes/answers)",
+            "SPACE  : timer start/pause",
+            "BACKSP : timer reset",
+            "TAB    : roster",
+            "ESC    : quit",
+        ]
+
+        if enable_game_show:
+            lines[2:2] = [
+                "1..9   : select team (disabled while BUZZ LOCKED)",
+                "B      : open buzz",
+                "R      : reset buzz",
+                "F      : fail (reopen buzz + block team for this task)",
+                "ENTER  : award points (= task points)",
+                "\\     : penalty (subtract task points)",
+                "S / L  : save / load",
+            ]
 
     y = box_y + 20
     for i, line in enumerate(lines):
