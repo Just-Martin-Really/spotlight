@@ -129,7 +129,7 @@ def draw_roster_overlay(
     session: Session,
     visible_count: int = 8,
 ) -> None:
-    """Draw a simple roster list of upcoming tasks with difficulty."""
+    """Draw a simple roster list of upcoming tasks with points."""
     w, h = surface.get_size()
     box_w = min(content_max_width(), w - 2 * pad_large())
     box_h = int(h * 0.55)
@@ -153,7 +153,7 @@ def draw_roster_overlay(
         idx = (start + offset) % len(session.tasks)
         task = session.tasks[idx]
         marker = "→" if idx == session.current_index else " "
-        line = f"{marker} {idx + 1:02d}. [{task.type}] diff={task.difficulty}"
+        line = f"{marker} {idx + 1:02d}. [{task.type}] {task.points}pt"
         s = font.render(line, True, settings.COLOR_TEXT_SECONDARY)
         surface.blit(s, (box_x + 20, y))
         y += s.get_height() + 6
@@ -179,9 +179,9 @@ def draw_help_overlay(surface: pygame.Surface, font: pygame.font.Font) -> None:
         "B      : open buzz",
         "R      : reset buzz",
         "F      : fail (reopen buzz + block team for this task)",
-        "V      : reveal/hide (Tabu)",
-        "ENTER  : award points (= task difficulty)",
-        "\\     : penalty (subtract difficulty)",
+        "V      : reveal/hide (Tabu + notes/answers)",
+        "ENTER  : award points (= task points)",
+        "\\     : penalty (subtract task points)",
         "SPACE  : timer start/pause",
         "BACKSP : timer reset",
         "TAB    : roster",

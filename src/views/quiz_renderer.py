@@ -24,7 +24,7 @@ class QuizRenderer(BaseRenderer):
             "cache_key": "quiz",
         }
 
-    def render_content(self, task: QuizTask) -> None:
+    def render_content(self, task: QuizTask, show_note: bool = False) -> None:
         assert isinstance(task, QuizTask), "QuizRenderer requires QuizTask"
 
         max_width = min(
@@ -53,7 +53,7 @@ class QuizRenderer(BaseRenderer):
             )
             current_y += line_h + pad_small()
 
-        if task.note:
+        if show_note and task.note:
             current_y += pad_medium()
             note_lines = wrap_text(task.note, self.font_body, max_width, hard_wrap=True)
             body_h = self.font_body.get_linesize()

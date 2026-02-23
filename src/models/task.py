@@ -13,17 +13,23 @@ from typing import List, Optional, Dict, Any
 
 @dataclass
 class BaseTask:
-    """
-    Base class for all task types.
+    """Base class for all task types.
 
     Attributes:
         type: Task category identifier (quiz, tabu, discussion)
         id: Unique identifier (auto-generated from index)
-        difficulty: Optional difficulty level (1-5) for the task
+        points: Points awarded for completing the task (100-500 in steps of 100)
+
+    Notes:
+        Historically Spotlight used `difficulty` (1-5). We keep `difficulty` as an
+        optional compatibility field, but scoring uses `points`.
     """
+
     type: str
     id: Optional[int] = None
-    difficulty: Optional[int] = None  # required by loader/factory; kept Optional for compatibility
+    points: Optional[int] = None
+    # Backwards compat only: may be present on older JSON files.
+    difficulty: Optional[int] = None
 
 
 @dataclass
@@ -112,8 +118,7 @@ class ExplainToTask(BaseTask):
 
 
 class TaskFactory:
-    """
-    Factory for creating task objects from dictionaries.
+    """Factory for creating task objects from dictionaries.
 
     Handles deserialization from JSON data and type-based dispatch
     to appropriate task subclasses.
@@ -156,17 +161,33 @@ class TaskFactory:
             raise ValueError(f"Optional field '{field}' must be a string when provided")
 
     @staticmethod
-    def _require_difficulty(data: Dict[str, Any]) -> None:
-        if "difficulty" not in data or data["difficulty"] is None:
-            raise ValueError("Field 'difficulty' is required (integer 1-5)")
-        value = data["difficulty"]
-        if not isinstance(value, int) or not (1 <= value <= 5):
-            raise ValueError("Field 'difficulty' must be an integer between 1 and 5")
+    def _require_points(data: Dict[str, Any]) -> None:
+        """Require `points` in 100-500 steps.
+
+        Compatibility:
+            If `points` is missing but legacy `difficulty` (1-5) is present, we
+            convert it to points.
+        """
+
+        if "points" not in data or data["points"] is None:
+            # Legacy fallback: difficulty 1..5 -> points 100..500
+            legacy = data.get("difficulty")
+            if legacy is None:
+                raise ValueError("Field 'points' is required (100, 200, 300, 400, 500)")
+            if not isinstance(legacy, int) or not (1 <= legacy <= 5):
+                raise ValueError(
+                    "Field 'difficulty' must be an integer between 1 and 5 (legacy), or provide 'points'"
+                )
+            data["points"] = legacy * 100
+            return
+
+        value = data["points"]
+        if not isinstance(value, int) or value not in {100, 200, 300, 400, 500}:
+            raise ValueError("Field 'points' must be one of: 100, 200, 300, 400, 500")
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any], task_id: int) -> BaseTask:
-        """
-        Create a task object from dictionary data.
+        """Create a task object from dictionary data.
 
         Args:
             data: Dictionary containing task data (typically from JSON)
@@ -211,7 +232,7 @@ class TaskFactory:
             cls._require_non_empty_str(data, "audience")
             cls._optional_str(data, "note")
 
-        cls._require_difficulty(data)
+        cls._require_points(data)
 
         # Get the appropriate task class
         task_class = cls._TASK_CLASSES[task_type]

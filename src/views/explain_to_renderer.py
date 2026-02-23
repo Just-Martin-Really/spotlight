@@ -22,7 +22,7 @@ class ExplainToRenderer(BaseRenderer):
             "cache_key": "explain_to",
         }
 
-    def render_content(self, task: ExplainToTask) -> None:
+    def render_content(self, task: ExplainToTask, show_note: bool = False) -> None:
         assert isinstance(task, ExplainToTask), "ExplainToRenderer requires ExplainToTask"
 
         center_y = self.screen_rect.height // 2 + settings.CONTENT_CENTER_Y_OFFSET
@@ -57,7 +57,7 @@ class ExplainToRenderer(BaseRenderer):
             )
             current_y += settings.FONT_SIZE_TITLE + settings.PADDING_SMALL
 
-        if task.note:
+        if show_note and task.note:
             note_y = current_y + settings.PADDING_LARGE
             note_lines = wrap_text(task.note, self.font_body, max_width, hard_wrap=True)
 

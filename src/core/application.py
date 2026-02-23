@@ -17,6 +17,7 @@ from src.models.game_state import GameState
 from src.models.session import Session
 from src.models.reveal_state import RevealState
 from src.models.scoring_state import ScoringState
+from src.models.presentation_mode import PresentationConfig
 from src.services.game_state_store import GameStateStoreError, load_state, save_state
 from src.services.task_loader import TaskLoader, TaskLoadError
 from src.controllers.input_controller import InputController
@@ -36,6 +37,7 @@ from src.views.game_overlays import (
     draw_timer,
 )
 from src.views.team_setup import run_team_setup
+from src.views.mode_select import run_mode_select
 
 
 class Application:
@@ -55,6 +57,9 @@ class Application:
         self.show_roster = False
         self.show_help = False
         self._game_state_path = "data/game_state.json"
+
+        # Presentation configuration
+        self.presentation = PresentationConfig(enable_game_show=True)
 
         # Transition state
         self._frame_surface = None
@@ -119,13 +124,22 @@ class Application:
         else:
             self._render_canvas = self.screen
 
-        # Startup setup: choose teams/names
-        team_names = run_team_setup(self.screen, self.clock)
-        if team_names is None:
+        # Startup setup: pick mode, then optionally teams.
+        enable_game_show = run_mode_select(self.screen, self.clock)
+        if enable_game_show is None:
             raise SystemExit(0)
+        self.presentation = PresentationConfig(enable_game_show=bool(enable_game_show))
 
-        self.game_state = GameState.with_teams(team_names)
-        self.selected_team = 0
+        if self.presentation.enable_game_show:
+            team_names = run_team_setup(self.screen, self.clock)
+            if team_names is None:
+                raise SystemExit(0)
+            self.game_state = GameState.with_teams(team_names)
+            self.selected_team = 0
+        else:
+            # Minimal stub game state: used for timer/status only.
+            self.game_state = GameState.with_teams(["Presenter"])
+            self.selected_team = None
 
         tasks = TaskLoader.load_tasks(self.task_file)
         print(f"Loaded {len(tasks)} tasks")
@@ -181,6 +195,8 @@ class Application:
             return
 
         if cmd.type == CommandType.SELECT_TEAM:
+            if not self.presentation.enable_game_show:
+                return
             # Once a team buzzed and is locked-in, don't allow manual switching.
             if self.game_state.buzz_state == self.game_state.buzz_state.LOCKED:
                 return
@@ -189,6 +205,8 @@ class Application:
                 self.game_state.set_status(f"Selected: {self.game_state.teams[cmd.team_index].name}", now_ms)
 
         elif cmd.type == CommandType.BUZZ:
+            if not self.presentation.enable_game_show:
+                return
             if cmd.team_index is not None:
                 if self.game_state.buzz(cmd.team_index, now_ms=now_ms):
                     # Auto-focus the buzzed team.
@@ -196,11 +214,15 @@ class Application:
                     self._base_frame = None
 
         elif cmd.type == CommandType.BUZZ_FAIL:
+            if not self.presentation.enable_game_show:
+                return
             # Reopen buzz and block the failing team for this task.
             self.game_state.fail_locked_team_and_reopen(now_ms=now_ms)
             self._base_frame = None
 
         elif cmd.type == CommandType.AWARD:
+            if not self.presentation.enable_game_show:
+                return
             task = self.session.current_task()
             task_id = int(task.id) if task.id is not None else None
 
@@ -233,9 +255,11 @@ class Application:
             self.game_state.reset_buzz(now_ms)
 
         elif cmd.type == CommandType.PENALTY:
+            if not self.presentation.enable_game_show:
+                return
             task = self.session.current_task()
-            assert task.difficulty is not None
-            points = int(task.difficulty)
+            assert task.points is not None
+            points = int(task.points)
 
             team_index = self.game_state.buzz_locked_team
             if team_index is None:
@@ -247,9 +271,13 @@ class Application:
                 self.game_state.add_points(team_index, -points, now_ms=now_ms)
 
         elif cmd.type == CommandType.BUZZ_OPEN:
+            if not self.presentation.enable_game_show:
+                return
             self.game_state.open_buzz(now_ms)
 
         elif cmd.type == CommandType.BUZZ_RESET:
+            if not self.presentation.enable_game_show:
+                return
             self.game_state.reset_buzz(now_ms)
 
         elif cmd.type == CommandType.TIMER_TOGGLE:
@@ -259,6 +287,9 @@ class Application:
             self.game_state.timer_reset(now_ms)
 
         elif cmd.type == CommandType.SAVE:
+            if not self.presentation.enable_game_show:
+                self.game_state.set_status("Save disabled in presenter mode", now_ms)
+                return
             try:
                 save_state(self._game_state_path, self.game_state)
                 self.game_state.set_status("Saved", now_ms)
@@ -266,6 +297,9 @@ class Application:
                 self.game_state.set_status(str(e), now_ms)
 
         elif cmd.type == CommandType.LOAD:
+            if not self.presentation.enable_game_show:
+                self.game_state.set_status("Load disabled in presenter mode", now_ms)
+                return
             try:
                 self.game_state = load_state(self._game_state_path)
                 # Clamp selection
@@ -279,7 +313,7 @@ class Application:
             if task.id is not None:
                 revealed = self.reveal_state.toggle(int(task.id))
                 self.game_state.set_status("Revealed" if revealed else "Hidden", now_ms)
-                # Base slide content changed (Tabu placeholder vs real content).
+                # Base slide content changed (notes and/or Tabu placeholder).
                 self._base_frame = None
             return
 
@@ -321,6 +355,11 @@ class Application:
         else:
             position_info = self.session.get_position_info()
 
+            # Notes are presenter-only: show when this task is revealed.
+            show_note = False
+            if current_task.id is not None:
+                show_note = self.reveal_state.is_revealed(int(current_task.id))
+
             if current_task.type == "tabu" and current_task.id is not None:
                 hidden = not self.reveal_state.is_revealed(int(current_task.id))
                 # Render via TabuRenderer with explicit hidden flag.
@@ -339,7 +378,33 @@ class Application:
                 else:
                     renderer.render(current_task, position_info)
             else:
-                renderer.render(current_task, position_info)
+                # Renderers with notes accept show_note kwarg.
+                if current_task.type == "quiz" and isinstance(renderer, QuizRenderer):
+                    renderer.screen.fill(settings.COLOR_BACKGROUND)
+                    glow_cfg = renderer.get_glow_config(current_task)
+                    if glow_cfg is not None:
+                        from src.services.glow_effect import render_glow
+                        render_glow(renderer.screen, glow_cfg["color"], glow_cfg.get("cache_key"))
+                    renderer.render_content(current_task, show_note=show_note)
+                    renderer._render_footer(position_info)
+                elif current_task.type == "explain_to" and isinstance(renderer, ExplainToRenderer):
+                    renderer.screen.fill(settings.COLOR_BACKGROUND)
+                    glow_cfg = renderer.get_glow_config(current_task)
+                    if glow_cfg is not None:
+                        from src.services.glow_effect import render_glow
+                        render_glow(renderer.screen, glow_cfg["color"], glow_cfg.get("cache_key"))
+                    renderer.render_content(current_task, show_note=show_note)
+                    renderer._render_footer(position_info)
+                elif current_task.type == "code" and isinstance(renderer, CodeRenderer):
+                    renderer.screen.fill(settings.COLOR_BACKGROUND)
+                    glow_cfg = renderer.get_glow_config(current_task)
+                    if glow_cfg is not None:
+                        from src.services.glow_effect import render_glow
+                        render_glow(renderer.screen, glow_cfg["color"], glow_cfg.get("cache_key"))
+                    renderer.render_content(current_task, show_note=show_note)
+                    renderer._render_footer(position_info)
+                else:
+                    renderer.render(current_task, position_info)
 
         return self._frame_surface.copy()
 
@@ -353,9 +418,11 @@ class Application:
         if renderer is None:
             return
 
-        draw_scoreboard(target_surface, renderer.font_small, self.game_state, self.selected_team)
+        if self.presentation.enable_game_show:
+            draw_scoreboard(target_surface, renderer.font_small, self.game_state, self.selected_team)
+            draw_buzz_status(target_surface, renderer.font_tiny, self.game_state)
+
         draw_timer(target_surface, renderer.font_small, self.game_state)
-        draw_buzz_status(target_surface, renderer.font_tiny, self.game_state)
         draw_status_message(target_surface, renderer.font_small, self.game_state)
         draw_help_hint(target_surface, renderer.font_tiny)
 

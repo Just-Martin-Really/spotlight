@@ -26,7 +26,7 @@ class CodeRenderer(BaseRenderer):
             "cache_key": "code",
         }
 
-    def render_content(self, task: CodeTask) -> None:
+    def render_content(self, task: CodeTask, show_note: bool = False) -> None:
         assert isinstance(task, CodeTask), "CodeRenderer requires CodeTask"
 
         if not hasattr(self, "font_mono"):
@@ -46,7 +46,7 @@ class CodeRenderer(BaseRenderer):
 
         self._render_code_box(task.code, code_start_y)
 
-        if task.note:
+        if show_note and task.note:
             note_y = self.screen_rect.height - pad_large() - ui_scale(150)
             draw_text_centered_shadow(
                 self.screen,

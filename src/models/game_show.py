@@ -2,7 +2,7 @@
 
 This module bridges the task roster (Session) and the game state (GameState)
 with a few small, deterministic rules:
-- awarding the current task's difficulty as points
+- awarding the current task's points
 - choosing the target team (buzz-locked team or a manually selected team)
 
 Contract
@@ -29,7 +29,7 @@ def award_points_for_current_task(
     """Award points for the current task.
 
     Rules:
-    - points = current_task.difficulty (guaranteed to be present by loader)
+    - points = current_task.points (guaranteed to be present by loader)
     - target team:
       - if buzz is locked: that team wins
       - else if a team is selected: use it
@@ -40,8 +40,8 @@ def award_points_for_current_task(
     """
 
     task = session.current_task()
-    assert task.difficulty is not None, "Task difficulty must be present (validated at load time)"
-    points = int(task.difficulty)
+    assert task.points is not None, "Task points must be present (validated at load time)"
+    points = int(task.points)
 
     team_index = game_state.buzz_locked_team
     if team_index is None:
