@@ -10,6 +10,12 @@ Design principle: Pure utility functions, no state, no side effects.
 from typing import List, Tuple
 import pygame
 
+from src.services.text_normalize import normalize_text
+
+
+def _normalize_for_render(text: str) -> str:
+    return normalize_text(text)
+
 
 def _split_long_word(word: str, font: pygame.font.Font, max_width: int) -> List[str]:
     """Split a single long token into chunks that fit max_width."""
@@ -51,6 +57,7 @@ def wrap_text(text: str, font: pygame.font.Font, max_width: int, hard_wrap: bool
     Returns:
         List of text lines that fit within max_width
     """
+    text = _normalize_for_render(text)
     words = text.split(" ")
     lines: List[str] = []
     current_line: List[str] = []
@@ -142,6 +149,7 @@ def draw_text_centered(
     y_position: int
 ) -> None:
     """Draw a single line of text centered horizontally."""
+    text = _normalize_for_render(text)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(centerx=surface.get_width() // 2, top=y_position)
     surface.blit(text_surface, text_rect)
@@ -157,6 +165,7 @@ def draw_text_centered_shadow(
     shadow_offset: Tuple[int, int] = (2, 2),
 ) -> None:
     """Draw centered text with a subtle drop shadow for better projector readability."""
+    text = _normalize_for_render(text)
     shadow_surface = font.render(text, True, shadow_color)
     shadow_rect = shadow_surface.get_rect(
         centerx=surface.get_width() // 2,
@@ -187,3 +196,44 @@ def get_multiline_text_height(lines: List[str], font: pygame.font.Font) -> int:
 
     line_height = font.size(lines[0])[1]
     return line_height * len(lines)
+
+
+def extract_matrix_block(text: str) -> tuple[str, list[str] | None]:
+    """Extract a simple matrix block from a question.
+
+    Heuristic:
+    - If the text contains a line starting with "A =" and then one or more
+      following lines (including blank-safe) that look like a bracketed matrix,
+      we return (prefix_text, matrix_lines).
+
+    Returns:
+        (prefix, matrix_lines)
+        matrix_lines is None if no matrix detected.
+    """
+
+    text = _normalize_for_render(text)
+    lines = text.split("\n")
+    if len(lines) < 2:
+        return text, None
+
+    # Find a likely start
+    start_idx = None
+    for i, line in enumerate(lines):
+        if line.strip().startswith("A ="):
+            start_idx = i
+            break
+    if start_idx is None:
+        return text, None
+
+    prefix = "\n".join(lines[:start_idx]).strip()
+    matrix_candidate = lines[start_idx:]
+
+    # Validate candidate: must contain '[' and ']' and at least one comma digit
+    joined = "\n".join(matrix_candidate)
+    if "[" not in joined or "]" not in joined:
+        return text, None
+    if not any(ch.isdigit() for ch in joined):
+        return text, None
+
+    return prefix, matrix_candidate
+

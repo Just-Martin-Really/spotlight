@@ -1,0 +1,84 @@
+type: tabu
+points: 300
+topic: Determinante
+forbidden_words: Fläche, Volumen, Orientierung
+
+type: tabu
+points: 500
+topic: Eigenvektor
+forbidden_words: Richtung, Streckung, Eigenwert, Skalierung
+
+type: explain_to
+points: 100
+topic: Was ist ein Vektor?
+audience: einem 10‑jährigen Kind
+note: Nutze die Idee „Pfeil mit Richtung und Länge“.
+
+
+type: code
+points: 200
+Code:
+
+import numpy as np
+A = np.array([[1, 2], [2, 4]])
+detA = np.linalg.det(A)
+invA = np.linalg.inv(A)
+print(invA)
+
+question: Warum führt dieser Code zu einem Fehler?
+note: Die Matrix ist singulär; Determinante = 0 → keine Inverse.
+
+type: explain_to
+points: 100
+topic: Was ist eine Matrix?
+audience: einem 12‑jährigen Schüler
+note: Betonung auf „Tabelle von Zahlen“.
+
+type: quiz
+points: 100
+question: Was ist ein Skalarprodukt?
+note: Abbildung mit Linearität, Symmetrie, Positivität.
+
+type: tabu
+points: 300
+topic: Orthogonale Matrix
+forbidden_words: Länge, Winkel, Skalarprodukt, Einheitsmatrix
+
+
+type: explain_to
+points: 100
+topic: Was ist eine lineare Gleichung?
+audience: einem 11‑jährigen Kind
+note: Betonung auf „nur malnehmen, plus, minus – keine Quadrate“.
+
+
+type: quiz
+points: 200
+question: Bestimme den Rang der Matrix
+A = [[1,2,3], 
+	[0,1,1],
+	[0,0,0]]
+note: Rang = 2.
+
+
+type: quiz
+points: 100
+question: Was bedeutet es, dass zwei Vektoren orthogonal sind?
+note: Ihr Skalarprodukt ist 0.
+
+
+type: discussion
+points: 200
+prompt: Warum kann man mit dem Gauß‑Verfahren zuverlässig entscheiden, ob ein lineares Gleichungssystem lösbar ist?
+
+
+type=discussion
+points=300
+prompt=Was ist der Zusammenhang zwischen linearen Abbildungen und Matrizen?
+spotlight_duration=4 Minuten
+
+
+type=discussion
+points=400
+prompt=Welche geometrische Bedeutung hat die Determinante in höheren Dimensionen (z.B. R^3)?
+spotlight_duration=4 Minuten

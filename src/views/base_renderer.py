@@ -42,28 +42,26 @@ class BaseRenderer(ABC):
 
     def _init_fonts(self) -> None:
         """Initialize all fonts used by renderers."""
+        families = [getattr(settings, "FONT_FAMILY_PRIMARY", None)]
+        families.extend(list(getattr(settings, "FONT_FAMILY_FALLBACKS", []) or []))
+        # De-dupe while preserving order
+        seen = set()
+        font_families: list[str] = []
+        for f in families:
+            if not f or not isinstance(f, str):
+                continue
+            if f in seen:
+                continue
+            seen.add(f)
+            font_families.append(f)
+
         try:
-            self.font_title = pygame.font.SysFont(
-                settings.FONT_FAMILY_PRIMARY,
-                ui_scale(settings.FONT_SIZE_TITLE),
-                bold=True,
-            )
-            self.font_subtitle = pygame.font.SysFont(
-                settings.FONT_FAMILY_PRIMARY,
-                ui_scale(settings.FONT_SIZE_SUBTITLE),
-            )
-            self.font_body = pygame.font.SysFont(
-                settings.FONT_FAMILY_PRIMARY,
-                ui_scale(settings.FONT_SIZE_BODY),
-            )
-            self.font_small = pygame.font.SysFont(
-                settings.FONT_FAMILY_PRIMARY,
-                ui_scale(settings.FONT_SIZE_SMALL),
-            )
-            self.font_tiny = pygame.font.SysFont(
-                settings.FONT_FAMILY_PRIMARY,
-                ui_scale(settings.FONT_SIZE_TINY),
-            )
+            family = font_families if font_families else None
+            self.font_title = pygame.font.SysFont(family, ui_scale(settings.FONT_SIZE_TITLE), bold=True)
+            self.font_subtitle = pygame.font.SysFont(family, ui_scale(settings.FONT_SIZE_SUBTITLE))
+            self.font_body = pygame.font.SysFont(family, ui_scale(settings.FONT_SIZE_BODY))
+            self.font_small = pygame.font.SysFont(family, ui_scale(settings.FONT_SIZE_SMALL))
+            self.font_tiny = pygame.font.SysFont(family, ui_scale(settings.FONT_SIZE_TINY))
         except Exception as e:
             # Fallback to pygame default font if system fonts fail
             print(f"Warning: Could not load system fonts, using defaults: {e}")
@@ -93,14 +91,9 @@ class BaseRenderer(ABC):
         # Render glow effect before content
         # Subclasses can override get_glow_config() to customize
         glow_config = self.get_glow_config(task)
-        if glow_config is not None:
+        if isinstance(glow_config, dict):
             from src.services.glow_effect import render_glow
-            cfg: dict[str, Any] = glow_config
-            render_glow(
-                self.screen,
-                cfg["color"],
-                cfg.get("cache_key"),
-            )
+            render_glow(self.screen, glow_config["color"], glow_config.get("cache_key"))
 
         # Render task-specific content (implemented by subclass)
         self.render_content(task)

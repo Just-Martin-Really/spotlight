@@ -51,8 +51,17 @@ COLOR_HIGHLIGHT = (100, 116, 139)  # Slate-500
 # =============================================================================
 
 # Font families (fallback to pygame defaults if not available)
-FONT_FAMILY_PRIMARY = "Arial"  # Clean, readable sans-serif
+FONT_FAMILY_PRIMARY = "DejaVu Sans"  # Better Unicode coverage for math symbols
 FONT_FAMILY_MONO = "Courier New"  # For code snippets if needed
+
+# Optional fallback fonts (first available wins). Helps when the primary font
+# isn't installed or doesn't cover some glyphs.
+FONT_FAMILY_FALLBACKS = [
+    "DejaVu Sans",
+    "Arial Unicode MS",
+    "Helvetica",
+    "Arial",
+]
 
 # Font sizes
 FONT_SIZE_TITLE = 72  # Main task title/question
@@ -84,6 +93,12 @@ BORDER_RADIUS = 12  # Rounded corners (if implemented)
 
 FADE_DURATION = 300  # Milliseconds for fade transitions (future feature)
 TRANSITION_SPEED = 0.15  # Smooth transition coefficient
+
+# Small slide-change flash overlay (helps when consecutive tasks look similar).
+# Kept short to avoid feeling like a "transition" and more like a crisp cue.
+# Defaults tuned to be subtle (no seizure vibes).
+SLIDE_FLASH_DURATION = 140  # ms
+SLIDE_FLASH_ALPHA = 22  # 0..255
 
 # =============================================================================
 # TASK-SPECIFIC SETTINGS

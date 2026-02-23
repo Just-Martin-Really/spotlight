@@ -27,6 +27,7 @@ from src.views.discussion_renderer import DiscussionRenderer
 from src.views.code_renderer import CodeRenderer
 from src.views.explain_to_renderer import ExplainToRenderer
 from src.services.transitions import crossfade
+from src.services.transition_math import transition_progress
 from src.views.game_overlays import (
     draw_buzz_status,
     draw_help_hint,
@@ -67,6 +68,10 @@ class Application:
         self._transition_next = None
         self._transition_start_ms = None
         self._last_task_index = 0
+
+        # One-shot slide-change flash cue
+        self._slide_flash_start_ms: int | None = None
+        self._slide_flash_color: tuple[int, int, int] | None = None
 
         # Base slide cache (task content only, no dynamic overlays)
         self._base_frame = None
@@ -363,10 +368,10 @@ class Application:
             if current_task.type == "tabu" and current_task.id is not None:
                 hidden = not self.reveal_state.is_revealed(int(current_task.id))
                 # Render via TabuRenderer with explicit hidden flag.
+                # Minimal change: call render_content directly to override content.
                 if isinstance(renderer, TabuRenderer):
                     renderer.render(current_task, position_info)  # clears + glow + footer
                     # Re-render content area with placeholder if hidden.
-                    # Minimal change: call render_content directly to override content.
                     if hidden:
                         self._frame_surface.fill(settings.COLOR_BACKGROUND)
                         glow_config = renderer.get_glow_config(current_task)
@@ -465,6 +470,18 @@ class Application:
             self._transition_start_ms = pygame.time.get_ticks()
             self._last_task_index = self.session.current_index
 
+            # Start a short flash cue (accent color of next task)
+            now = self._transition_start_ms
+            self._slide_flash_start_ms = now
+            try:
+                glow_cfg = self.renderers.get(self.session.current_task().type).get_glow_config(self.session.current_task())  # type: ignore[union-attr]
+                if isinstance(glow_cfg, dict) and "color" in glow_cfg:
+                    self._slide_flash_color = glow_cfg["color"]
+                else:
+                    self._slide_flash_color = settings.COLOR_BORDER
+            except Exception:
+                self._slide_flash_color = settings.COLOR_BORDER
+
         # If a transition is active, blend base slides
         if (
             self._transition_start_ms is not None
@@ -473,10 +490,29 @@ class Application:
         ):
             elapsed = pygame.time.get_ticks() - self._transition_start_ms
             duration = max(1, int(settings.FADE_DURATION))
-            progress = min(1.0, max(0.0, elapsed / duration))
+            progress = transition_progress(elapsed, duration)
 
             blended = crossfade(self._transition_prev, self._transition_next, progress)
             self._render_overlay(blended)
+
+            # Slide flash cue: fade out quickly over a short window
+            if self._slide_flash_start_ms is not None:
+                flash_elapsed = pygame.time.get_ticks() - self._slide_flash_start_ms
+                flash_duration = int(getattr(settings, "SLIDE_FLASH_DURATION", 0) or 0)
+                if flash_duration > 0 and flash_elapsed < flash_duration:
+                    alpha_max = int(getattr(settings, "SLIDE_FLASH_ALPHA", 0) or 0)
+                    alpha_max = max(0, min(255, alpha_max))
+                    # Linear fade-out
+                    flash_progress = transition_progress(flash_elapsed, flash_duration)
+                    alpha = int(alpha_max * (1.0 - flash_progress))
+                    if alpha > 0:
+                        overlay = pygame.Surface(blended.get_size(), pygame.SRCALPHA)
+                        color = self._slide_flash_color or settings.COLOR_BORDER
+                        overlay.fill((color[0], color[1], color[2], alpha))
+                        blended.blit(overlay, (0, 0))
+                else:
+                    self._slide_flash_start_ms = None
+
             self._blit_to_screen(blended)
 
             if progress >= 1.0:
@@ -488,6 +524,23 @@ class Application:
                 self._base_frame = self._render_base_slide()
             frame = self._base_frame.copy()
             self._render_overlay(frame)
+
+            # If we weren't in crossfade but flash is active, still render it.
+            if self._slide_flash_start_ms is not None:
+                flash_elapsed = pygame.time.get_ticks() - self._slide_flash_start_ms
+                flash_duration = int(getattr(settings, "SLIDE_FLASH_DURATION", 0) or 0)
+                if flash_duration > 0 and flash_elapsed < flash_duration:
+                    alpha_max = int(getattr(settings, "SLIDE_FLASH_ALPHA", 0) or 0)
+                    alpha_max = max(0, min(255, alpha_max))
+                    flash_progress = transition_progress(flash_elapsed, flash_duration)
+                    alpha = int(alpha_max * (1.0 - flash_progress))
+                    if alpha > 0:
+                        overlay = pygame.Surface(frame.get_size(), pygame.SRCALPHA)
+                        color = self._slide_flash_color or settings.COLOR_BORDER
+                        overlay.fill((color[0], color[1], color[2], alpha))
+                        frame.blit(overlay, (0, 0))
+                else:
+                    self._slide_flash_start_ms = None
             self._blit_to_screen(frame)
 
     def _render_error(self, message: str) -> None:
